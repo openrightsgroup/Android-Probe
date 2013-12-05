@@ -58,31 +58,47 @@ public class WirelessConfigFragment extends Fragment
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         //Mobile stuff
-        TelephonyManager telephonyManager =((TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE));
+        try
+        {
+            TelephonyManager telephonyManager =((TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE));
 
-        String mobileNet = telephonyManager.getNetworkOperatorName();
+            String mobileNet = telephonyManager.getNetworkOperatorName();
 
-        if(mobileNet.equals(""))
-            mobileNet = "Unknown";
+            if(mobileNet.equals(""))
+                mobileNet = "Unknown";
 
-        ((TextView) rootView.findViewById(R.id.mobileNetwork)).setText(mobileNet);
+            ((TextView) rootView.findViewById(R.id.mobileNetwork)).setText(mobileNet);
 
-        String simNet = telephonyManager.getSimOperatorName();
+            String simNet = telephonyManager.getSimOperatorName();
 
-        if(simNet.equals(""))
-            simNet = "Unknown";
+            if(simNet.equals(""))
+                simNet = "Unknown";
 
-        ((TextView) rootView.findViewById(R.id.simNetwork)).setText(simNet);
-
+            ((TextView) rootView.findViewById(R.id.simNetwork)).setText(simNet);
+        }
+        catch (NullPointerException npe)
+        {
+            npe.printStackTrace();
+        }
 
         //WiFi Stuff
-        WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        String wifiName = wifiInfo.getSSID();
+        String wifiName = "";
 
-        Log.e("WiFi", wifiName + " / " + wifiInfo.getBSSID() + " / " + wifiInfo.getNetworkId());
+        try
+        {
+            WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            wifiName = wifiInfo.getSSID();
 
-        ((TextView) rootView.findViewById(R.id.wifiNetwork)).setText(wifiName.replaceAll("\"",""));
+            Log.e("WiFi", wifiName + " / " + wifiInfo.getBSSID() + " / " + wifiInfo.getNetworkId());
+
+            ((TextView) rootView.findViewById(R.id.wifiNetwork)).setText(wifiName.replaceAll("\"",""));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         //If wifi is new name
         LocalCache lc = null;
