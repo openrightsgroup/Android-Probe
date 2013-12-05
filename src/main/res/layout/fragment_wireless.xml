@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/wirelessMessage"
+        android:id="@+id/descText"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="WiFi Network:"
+        android:fontFamily="sans-serif-light"
+        android:id="@+id/wifiLabel"
+        android:layout_below="@+id/descText"
+        android:layout_alignLeft="@+id/descText"
+        android:paddingTop="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="ABC"
+        android:fontFamily="sans-serif-light"
+        android:id="@+id/wifiNetwork"
+        android:layout_alignRight="@+id/descText"
+        android:layout_alignBaseline="@+id/wifiLabel"
+        android:paddingRight="12dp" />
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/wifiLabel"
+        android:id="@+id/WiFiMetaContainer"
+        android:orientation="horizontal"
+        android:showDividers="none"
+        android:divider="?android:dividerVertical"
+        android:dividerPadding="8dp"
+        android:baselineAligned="false"
+        android:gravity="right"
+        android:layout_toRightOf="@+id/newNetworkIcon">
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/WiFiISPET"
+
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="12dp" />
+
+        <ImageButton
+            style="?android:borderlessButtonStyle"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:id="@+id/SSIDNameSaveButton"
+            android:contentDescription="Save this ISP / SSID combo"
+            android:src="@drawable/ic_save" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Mobile Network:"
+        android:fontFamily="sans-serif-light"
+        android:id="@+id/mobileLabel"
+        android:layout_alignLeft="@+id/wifiLabel"
+        android:paddingTop="20dp"
+        android:layout_below="@+id/WiFiMetaContainer" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="SIM Network:"
+        android:id="@+id/simLabel"
+        android:layout_below="@+id/mobileLabel"
+        android:fontFamily="sans-serif-light"
+        android:layout_alignLeft="@+id/mobileLabel"
+        android:paddingTop="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/mobileNetwork"
+        android:fontFamily="sans-serif-light"
+        android:layout_alignRight="@+id/descText"
+        android:layout_alignBaseline="@+id/mobileLabel"
+        android:paddingRight="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/simNetwork"
+        android:fontFamily="sans-serif-light"
+        android:layout_alignBottom="@+id/simLabel"
+        android:layout_alignParentRight="true"
+        android:paddingRight="12dp" />
+
+
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send ISP data with results"
+        android:id="@+id/sendDataCB"
+        android:layout_below="@+id/simLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="40dp"
+        android:checked="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/newNetworkIcon"
+        android:src="@drawable/ic_alerts_and_states_warning"
+        android:layout_alignLeft="@+id/wifiLabel"
+        android:layout_below="@+id/wifiLabel" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_alignTop="@+id/sendDataCB"
+        android:layout_toRightOf="@+id/sendDataCB"
+        android:layout_marginLeft="40dp"
+        android:layout_alignBottom="@+id/sendDataCB"
+        android:visibility="invisible" />
+
+</RelativeLayout>
+    </ScrollView>

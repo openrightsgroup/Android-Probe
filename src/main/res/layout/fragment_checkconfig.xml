@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Minimum Delay"
+        android:id="@+id/delayLabel"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
+
+    <SeekBar
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar"
+        android:layout_below="@+id/delayLabel"
+        android:layout_marginTop="12dp"
+        android:layout_centerHorizontal="true"
+        android:progress="1"
+        android:max="1440" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="1 min"
+        android:id="@+id/delayValueLabel"
+        android:layout_below="@+id/seekBar"
+        android:layout_alignRight="@+id/seekBar" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/checkConfigFheckBoxLabel"
+        android:id="@+id/ccEnabled"
+        android:layout_below="@+id/delayValueLabel"
+        android:layout_alignLeft="@+id/seekBar"
+        android:layout_marginTop="30dp" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_below="@+id/ccEnabled"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible" />
+
+</RelativeLayout>
+</ScrollView>
