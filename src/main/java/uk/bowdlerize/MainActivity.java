@@ -110,6 +110,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         getActionBar().setTitle(getString(R.string.actionBarTitle));
         getActionBar().setSubtitle(getString(R.string.actionBarSubtitle));
+        getActionBar().setIcon(R.drawable.ic_ab_alt);
 
         settings = getGCMPreferences(this);
 
