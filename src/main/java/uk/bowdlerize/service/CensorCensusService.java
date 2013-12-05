@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -47,6 +48,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -160,35 +165,58 @@ public class CensorCensusService extends Service
                         mBuilder.setProgress(2,1,true);
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-                        //Do the actual check
-                        wasCensored = checkURL(intent.getStringExtra("url"));
-
-                        //We're complete - update the time
-                        currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
-                        //Update our local stats
-                        setCounts(wasCensored.first);
-
-                        if(wasCensored.first)
+                        try
                         {
-                            mBuilder.setTicker("Found a possibly censored URL!");
+                            //Do the actual check
+                            wasCensored = checkURL(intent.getStringExtra("url"));
+
+                            //We're complete - update the time
+                            currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
+                            //Update our local stats
+                            setCounts(wasCensored.first);
+
+                            if(wasCensored.first)
+                            {
+                                mBuilder.setTicker("Found a possibly censored URL!");
+                                mBuilder.setStyle(new NotificationCompat.InboxStyle()
+                                        .setBigContentTitle("Censor Census - Waiting")
+                                        .addLine("Last check: " + currentDateTimeString)
+                                        .addLine("Last URL was possibly censored!")
+                                        .addLine("MD5: " + intent.getStringExtra("hash"))
+                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
+
+                                );
+                                mBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large_censored));
+                            }
+                            else
+                            {
+                                mBuilder.setStyle(new NotificationCompat.InboxStyle()
+                                        .setBigContentTitle("Censor Census - Waiting")
+                                        .addLine("Last check: " + currentDateTimeString)
+                                        .addLine("Last URL wasn't censored!")
+                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
+                                );
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+
+                            //We're complete - update the time
+                            currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
                             mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                                    .setBigContentTitle("Censor Census - Waiting")
+                                    .setBigContentTitle("Censor Census - Error")
                                     .addLine("Last check: " + currentDateTimeString)
-                                    .addLine("Last URL was possibly censored!")
-                                    .addLine("MD5: " + intent.getStringExtra("hash"))
+                                    .addLine("An exception was encountered during the last check")
                                     .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
                             );
+
+                            wasCensored = new Pair(false,0);
                         }
-                        else
-                        {
-                            mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                                    .setBigContentTitle("Censor Census - Waiting")
-                                    .addLine("Last check: " + currentDateTimeString)
-                                    .addLine("Last URL wasn't censored!")
-                                    .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
-                            );
-                        }
+
+
                         mBuilder.setProgress(0,0,false);
                         mBuilder.setSmallIcon(R.drawable.ic_stat_waiting);
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -368,18 +396,28 @@ public class CensorCensusService extends Service
     }
 
     //Return whether the URL is censored and a confidence level (1-100)
-    private Pair<Boolean,Integer> checkURL(String checkURL)
+    private Pair<Boolean,Integer> checkURL(String checkURL) throws IllegalArgumentException, URISyntaxException
     {
         if(!checkURL.startsWith("http"))
             checkURL = "http://" + checkURL;
 
-        Log.e("Checking url",checkURL);
+        Uri mUri = Uri.parse(checkURL);
 
+        if(null == mUri.getEncodedQuery())
+        {
+            checkURL = mUri.getScheme() + "://" + mUri.getHost() + mUri.getPath();
+        }
+        else
+        {
+            checkURL = mUri.getScheme() + "://" + mUri.getHost() + mUri.getPath() +"?" + URLEncoder.encode(mUri.getEncodedQuery());
+        }
+
+        Log.e("Checking url",checkURL);
 
         client = new DefaultHttpClient();
 
         headRequest = new HttpHead(checkURL);
-        headRequest.setHeader("User-Agent", "Claire Perry - The Internet Censor");
+        headRequest.setHeader("User-Agent", "OONI Android Probe");
 
         try
         {
