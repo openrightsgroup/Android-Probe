@@ -6,7 +6,7 @@
     <string name="actionBarSubtitle">Making censorship accountable</string>
     <string name="title_section1">Wireless Config</string>
     <string name="title_section2">Request Config</string>
-    <string name="title_section3">ORG / OONI Signup</string>
+    <string name="title_section3">Observatory of Net Interference Signup</string>
     <string name="title_section4">Statistics</string>
     <string name="action_settings">Settings</string>
     <string name="action_add">Test a Link</string>
@@ -21,7 +21,7 @@
 
     <!-- Fragment ORG -->
     <string name="orgIntro">If you would also like to participate in the Open Rights Group Censorship Monitoring Project ( http://bit.ly/18B4e8Y ) you will need to signup and configure your device as a probe.</string>
-    <string name="orgUnavailable">THIS FEATURE IS UNAVAILABLE AT THE MOMENT</string>
+    <string name="orgUnavailable">THIS FEATURE IS CURRENTLY UNAVAILABLE</string>
 
     <!--Fragment - Wireless -->
     <string name="wirelessMessage">To better profile which ISPs are censoring and which aren\'t it would be useful to have meta data about the ISP used to check URLs.\n\nBy volunteering this information it will give a clearer picture of the scope of censorship.</string>

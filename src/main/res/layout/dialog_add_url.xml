@@ -2,15 +2,20 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content">
-    <ImageView
+    <TextView
         android:src="@drawable/dialog_banner"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:scaleType="center"
-        android:background="#2f722c"
-        android:contentDescription="@string/app_name" />
+        android:background="#D81920"
+        android:fontFamily="sans-serif-light"
+        android:contentDescription="@string/app_name"
+        android:textColor="#FFFFFF"
+        android:text="@string/action_add"
+        android:textSize="40sp"
+        android:gravity="center_vertical|center_horizontal" />
     <EditText
         android:id="@+id/urlET"
         android:inputType="textWebEditText"

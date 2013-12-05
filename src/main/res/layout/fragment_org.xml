@@ -23,6 +23,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/orgIntro"
             android:id="@+id/textView"
+            android:textColorLink="#D81920"
             android:layout_below="@+id/imageView"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="20dp"
