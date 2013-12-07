@@ -31,33 +31,6 @@
             android:layout_marginRight="20dp"
             android:autoLink="web" />
 
-        <EditText
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:ems="10"
-            android:id="@+id/emailAddressET"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="Email address"
-            android:layout_marginTop="20dp"
-            android:enabled="false" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/orgUnavailable"
-            android:id="@+id/UnavailWarn"
-            android:layout_below="@+id/emailAddressET"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="12dp"
-            android:gravity="center_horizontal"
-            android:textColor="#c00000" />
     </RelativeLayout>
 
     </ScrollView>
@@ -74,10 +47,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/action_gencert"
-            android:id="@+id/SearchButton"
-            style="?android:buttonBarButtonStyle"
-            android:enabled="false"/>
+            android:id="@+id/GenProbeButton"
+            style="?android:buttonBarButtonStyle"/>
 
 
     </LinearLayout>
-    </RelativeLayout>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
+</RelativeLayout>

@@ -1,0 +1,42 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:id="@+id/progressContainer"
+        android:background="#333333"
+        android:paddingBottom="12dp">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/statusProgressBar"
+            android:layout_marginLeft="@dimen/input_padding"
+            android:layout_marginRight="@dimen/input_padding"
+            android:layout_marginTop="8dp"
+            android:max="4" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/progressStatusTV"
+            android:layout_below="@+id/statusProgressBar"
+            android:layout_alignParentRight="false"
+            android:layout_alignRight="@+id/statusProgressBar"
+            android:textColor="#FFFFFF" />
+    </RelativeLayout>
+
+    <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity"
+        android:layout_below="@+id/progressContainer" />
+</RelativeLayout>

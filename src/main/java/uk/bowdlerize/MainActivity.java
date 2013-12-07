@@ -86,6 +86,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static int SETUP_INTENT = 2000;
+
     String SENDER_ID = "974943648388";
     static final String TAG = "MainActivity";
     GoogleCloudMessaging gcm;
@@ -114,36 +116,33 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         settings = getGCMPreferences(this);
 
-        //Check if the user has agreed
-        if(settings.getBoolean("agreed",false))
+        //Check if the user has agreed to the T&Cs / has a private key for themselves and the probe
+        if(settings.getBoolean("agreed",false) && !settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"").equals("") && !settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY,"").equals(""))
         {
             onConfirmed();
         }
         else
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.warningMessage).setTitle(R.string.warningTitle);
-            builder.setPositiveButton(R.string.warningAgree, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putBoolean("agreed", true);
-                    editor.commit();
-                    dialog.dismiss();
-                    Toast.makeText(MainActivity.this,getString(R.string.warningAgreed),Toast.LENGTH_SHORT).show();
-                    configureTabs();
-                }
-            });
-            builder.setNegativeButton(R.string.warningExit, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    dialog.dismiss();
-                    finish();
-                }
-            });
-            builder.show();
+            Intent SetupIntent = new Intent(MainActivity.this, SetupActivity.class);
+            startActivityForResult(SetupIntent, SETUP_INTENT);
         }
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == SETUP_INTENT)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                onConfirmed();
+            }
+            else
+            {
+                finish();
+            }
+        }
+    }
+
 
     private void onConfirmed()
     {
@@ -199,6 +198,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
         return true;
     }
+
     private String getRegistrationId(Context context)
     {
         final SharedPreferences prefs = getGCMPreferences(context);
@@ -541,12 +541,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
                 case 2:
                 {
-                    getFragment = new OrgFragment();
-                }
-                break;
-
-                case 3:
-                {
                     getFragment = new StatsFragment();
                 }
                 break;
@@ -558,7 +552,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            return 3;
         }
 
         @Override
@@ -570,8 +564,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 case 1:
                     return getString(R.string.title_section2).toUpperCase(l);
                 case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
-                case 3:
                     return getString(R.string.title_section4).toUpperCase(l);
             }
             return null;

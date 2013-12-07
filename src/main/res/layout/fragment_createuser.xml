@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_above="@+id/linearLayout">
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/createUserIntro"
+            android:id="@+id/userIntro"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="20dp" />
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/emailAddressET"
+            android:layout_below="@+id/userIntro"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="@string/emailHint"
+            android:layout_marginTop="20dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/passwordET"
+            android:layout_below="@+id/emailAddressET"
+            android:layout_alignLeft="@+id/emailAddressET"
+            android:layout_alignRight="@+id/emailAddressET"
+            android:layout_marginTop="20dp"
+            android:hint="Password" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/privKeyET"
+            android:layout_below="@+id/passwordET"
+            android:layout_alignLeft="@+id/passwordET"
+            android:layout_alignRight="@+id/passwordET"
+            android:lines="4"
+            android:layout_marginTop="20dp"
+            android:hint="@string/privKeyHint"
+            android:gravity="left|top" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:layout_alignParentTop="false"
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
+        </RelativeLayout>
+        </ScrollView>
+
+    <LinearLayout style="?android:buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayout"
+        android:layout_alignParentEnd="true"
+        android:gravity="bottom">
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/checkLogin"
+            android:id="@+id/CheckStatusButton"
+            android:visibility="gone"
+            style="?android:buttonBarButtonStyle"
+            android:enabled="true"/>
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/loginUser"
+            android:id="@+id/LoginButton"
+            style="?android:buttonBarButtonStyle"
+            android:enabled="true"/>
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/registerUser"
+            android:id="@+id/RegisterButton"
+            style="?android:buttonBarButtonStyle"
+            android:enabled="true"/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

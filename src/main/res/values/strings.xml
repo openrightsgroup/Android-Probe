@@ -11,7 +11,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_add">Test a Link</string>
     <string name="action_cancel">Cancel</string>
-    <string name="action_gencert">Generate Client Certificate</string>
+    <string name="action_gencert">Generate Probe Certificate</string>
 
     <string name="warningTitle">WARNING: READ BEFORE USE</string>
     <string name="warningMessage">IT IS STRONGLY RECOMMENDED YOU DO NOT USE THIS APP UNLESS YOU FULLY UNDERSTAND THE IMPLICATIONS\n\nIf you click "I agree" this app will possibly receive URLs that lead to censored or illegal content.\n\nThe app will only make a HTTP HEAD request so content (legal or otherwise) should not be downloaded (as per RFC2616) but there is still the possibility of repercussions.\n\nBy agreeing to use this app you indemnify the author of any liability.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</string>
@@ -20,7 +20,7 @@
     <string name="warningAgreed">Thank you for helping to make the Internet more accountable!</string>
 
     <!-- Fragment ORG -->
-    <string name="orgIntro">If you would also like to participate in the Open Rights Group Censorship Monitoring Project ( http://bit.ly/18B4e8Y ) you will need to signup and configure your device as a probe.</string>
+    <string name="orgIntro">To participate in the Open Rights Group Censorship Monitoring Project ( http://bit.ly/18B4e8Y ) tap \"Generate a Certificate\" which\'ll register this probe.</string>
     <string name="orgUnavailable">THIS FEATURE IS CURRENTLY UNAVAILABLE</string>
 
     <!--Fragment - Wireless -->
@@ -29,4 +29,15 @@
 
     <!-- Fragment - Check Config -->
     <string name="checkConfigFheckBoxLabel">Receive URL check requests and process them automatically</string>
+
+    <!-- Fragments - Setup -->
+    <string name="title_user_setup">User Setup</string>
+    <string name="title_probe_setup">Probe Setup</string>
+    <string name="emailHint">Email Address</string>
+    <string name="loginUser">Login</string>
+    <string name="registerUser">Register</string>
+    <string name="privKeyHint">-----BEGIN RSA PRIVATE KEY-----\nAdd your existing private key here if you have one\n\n-----END RSA PRIVATE KEY-----</string>
+    <string name="createUserIntro">To help keep track of probe registrations please create an account.</string>
+    <string name="createUserIntroComplete">Your account is configured and ready to register probes!</string>
+    <string name="checkLogin">Check Status</string>
 </resources>
