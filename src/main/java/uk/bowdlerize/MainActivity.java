@@ -29,6 +29,8 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -347,7 +349,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -450,6 +453,64 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     }
                 });
                 builder.show();
+                return true;
+            }
+
+            case R.id.action_get_url:
+            {
+                Intent getURLIntent = new Intent(MainActivity.this, CensorCensusService.class);
+                Bundle extras = new Bundle();
+                extras.putBoolean(API.EXTRA_POLL,true);
+                getURLIntent.putExtras(extras);
+                startService(getURLIntent);
+                return true;
+            }
+
+            case R.id.action_privatekey:
+            {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                builder.setPositiveButton(R.string.action_user_key, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        String probeKey = "-----BEGIN RSA PRIVATE KEY-----\n" + settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found") + "\n-----END RSA PRIVATE KEY-----";
+
+                        ClipData clip = ClipData.newPlainText("Censorship Monitoring Project Probe Private Key",probeKey);
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(MainActivity.this, "Key has been added to the clipboard.", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                //Probes should be unique
+                /*builder.setNeutralButton(R.string.action_probe_key, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        String probeKey = "-----BEGIN RSA PRIVATE KEY-----\n" + settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY,"No key found") + "\n-----END RSA PRIVATE KEY-----";
+
+                        ClipData clip = ClipData.newPlainText("Censorship Monitoring Project Probe Private Key",probeKey);
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(MainActivity.this, "Key has been added to the clipboard.", Toast.LENGTH_LONG).show();
+                    }
+                });*/
+
+                builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.cancel();
+                    }
+                });
+                builder.setTitle(getString(R.string.privKeyDialogTitle));
+                builder.setMessage(getString(R.string.privKeyDialogMessage));
+                builder.show();
+
                 return true;
             }
         }

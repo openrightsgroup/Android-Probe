@@ -3,6 +3,21 @@
     <item android:id="@+id/action_add"
         android:title="@string/action_add"
         android:orderInCategory="100"
-        android:showAsAction="always"
+        android:showAsAction="always|withText"
+        android:titleCondensed="Add URL"
         android:icon="@drawable/ic_add_url"/>
+
+
+    <item android:id="@+id/action_get_url"
+        android:title="@string/action_get_key"
+        android:showAsAction="always|withText"
+        android:titleCondensed="Get URL"
+        android:icon="@drawable/ic_action_get_url"/>
+
+
+    <item android:id="@+id/action_privatekey"
+        android:title="@string/action_seekey"
+        android:showAsAction="always|withText"
+        android:titleCondensed="See Key"
+        android:icon="@drawable/ic_action_privatekey"/>
 </menu>

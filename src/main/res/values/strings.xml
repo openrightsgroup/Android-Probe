@@ -9,9 +9,15 @@
     <string name="title_section3">Observatory of Net Interference Signup</string>
     <string name="title_section4">Statistics</string>
     <string name="action_settings">Settings</string>
-    <string name="action_add">Test a Link</string>
+    <string name="action_add">Test Link</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_gencert">Generate Probe Certificate</string>
+    <string name="action_seekey">See Key</string>
+    <string name="action_get_key">Poll for a URL</string>
+    <string name="action_user_key">Get User Key</string>
+    <string name="action_probe_key">Get Probe Key</string>
+    <string name="privKeyDialogTitle">Private Keys</string>
+    <string name="privKeyDialogMessage">Add your private key to the clipboard to mange other probes or just to put somewhere for safe keeping</string>
 
     <string name="warningTitle">WARNING: READ BEFORE USE</string>
     <string name="warningMessage">IT IS STRONGLY RECOMMENDED YOU DO NOT USE THIS APP UNLESS YOU FULLY UNDERSTAND THE IMPLICATIONS\n\nIf you click "I agree" this app will possibly receive URLs that lead to censored or illegal content.\n\nThe app will only make a HTTP HEAD request so content (legal or otherwise) should not be downloaded (as per RFC2616) but there is still the possibility of repercussions.\n\nBy agreeing to use this app you indemnify the author of any liability.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</string>
