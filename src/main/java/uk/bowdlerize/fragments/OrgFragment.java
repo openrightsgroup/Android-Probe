@@ -129,6 +129,11 @@ public class OrgFragment extends Fragment
                         publishProgress();
                         String probe_seed = Hashes.MD5(Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID));
                         String UUID = Hashes.MD5(probe_seed + "-" +  probeHMAC);
+
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(API.SETTINGS_UUID,UUID);
+                        editor.commit();
+
                         return api.registerProbe(probe_seed, UUID,"");
                     }
                 }

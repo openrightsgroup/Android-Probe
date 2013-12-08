@@ -24,11 +24,15 @@
     <string name="orgUnavailable">THIS FEATURE IS CURRENTLY UNAVAILABLE</string>
 
     <!--Fragment - Wireless -->
-    <string name="wirelessMessage">To better profile which ISPs are censoring and which aren\'t it would be useful to have meta data about the ISP used to check URLs.\n\nBy volunteering this information it will give a clearer picture of the scope of censorship.</string>
-    <string name="wirelessNew">This WiFi network hasn\'t been seen before, which ISP does it use?</string>
+    <string name="wirelessMessage">To better profile which ISPs are censoring and which aren\'t it is useful to have meta data about the ISP used to check URLs.</string>
+    <string name="wirelessNew">This WiFi network hasn\'t been seen before, checking what it is?</string>
 
     <!-- Fragment - Check Config -->
+    <string name="checkFrequencyLabel">Check Frequency</string>
     <string name="checkConfigFheckBoxLabel">Receive URL check requests and process them automatically</string>
+    <string name="radioGCMFull">Receive URL checks through Google Cloud Messaging</string>
+    <string name="radioGCMPartial">Receive poll prompts via Google Cloud Messaging but poll for URL details</string>
+    <string name="radioPoll">Do not use Google Cloud Messaging at all, poll for new URLs only</string>
 
     <!-- Fragments - Setup -->
     <string name="title_user_setup">User Setup</string>

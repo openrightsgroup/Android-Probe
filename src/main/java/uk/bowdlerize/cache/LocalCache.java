@@ -55,7 +55,7 @@ public class LocalCache
     public boolean addSSID(String SSID, String ISP)
     {
         boolean success = false;
-        Log.e("addSSID", SSID + " / " + ISP);
+        //Log.e("addSSID", SSID + " / " + ISP);
         try
         {
             database.beginTransaction();
@@ -76,7 +76,7 @@ public class LocalCache
             database.endTransaction();
         }
 
-        Log.e("addSSID",Boolean.toString(success));
+        //Log.e("addSSID",Boolean.toString(success));
 
         return success;
     }
@@ -85,17 +85,17 @@ public class LocalCache
     {
         try
         {
-            Log.e("findSSID", SSID);
+            //Log.e("findSSID", SSID);
             Cursor cursor = database.query("wifiNetworks", wifiColumns,  "SSID=?", new String[]{SSID}, null, null, null);
 
             if(cursor.moveToFirst())
             {
-                Log.e("findSSID", cursor.getString(1));
+                //Log.e("findSSID", cursor.getString(1));
                 return new Pair(true,cursor.getString(1));
             }
             else
             {
-                Log.e("findSSID", "Nope");
+                //Log.e("findSSID", "Nope");
                 return new Pair(false,"");
             }
         }

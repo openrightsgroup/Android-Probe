@@ -228,7 +228,7 @@ public class CreateUserFragment extends Fragment
 
     private void loginAccount()
     {
-
+        Toast.makeText(getActivity(),"This isn't implemented yet",Toast.LENGTH_LONG).show();
     }
 
     private void checkPending()

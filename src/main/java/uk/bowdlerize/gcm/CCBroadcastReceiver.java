@@ -31,6 +31,7 @@ import android.util.Pair;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.service.CensorCensusService;
@@ -135,6 +136,9 @@ public class CCBroadcastReceiver extends BroadcastReceiver
                         }
                     }
                 }
+
+                if(extras.containsKey("tickle"))
+                    extras.putBoolean(API.EXTRA_GCM_TICKLE,true);
 
                 receiveURLIntent.putExtras(extras);
                 context.startService(receiveURLIntent);

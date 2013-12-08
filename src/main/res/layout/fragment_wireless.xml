@@ -58,15 +58,8 @@
 
             android:layout_alignParentLeft="false"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="12dp" />
+            android:enabled="false" />
 
-        <ImageButton
-            style="?android:borderlessButtonStyle"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:id="@+id/SSIDNameSaveButton"
-            android:contentDescription="Save this ISP / SSID combo"
-            android:src="@drawable/ic_save" />
     </LinearLayout>
 
     <TextView

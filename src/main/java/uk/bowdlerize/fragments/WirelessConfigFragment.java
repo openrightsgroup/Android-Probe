@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -38,6 +39,8 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
 import uk.bowdlerize.cache.LocalCache;
@@ -48,6 +51,7 @@ public class WirelessConfigFragment extends Fragment
     EditText ISPName;
     View saveData;
     View newNetworkIcon;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -118,15 +122,18 @@ public class WirelessConfigFragment extends Fragment
             lc.close();
 
         newNetworkIcon = rootView.findViewById(R.id.newNetworkIcon);
+        saveData = rootView.findViewById(R.id.progressBar);
+        ISPName = (EditText) rootView.findViewById(R.id.WiFiISPET);
+
         if(seenBefore.first)
         {
-            ((EditText) rootView.findViewById(R.id.WiFiISPET)).setText(seenBefore.second);
-            rootView.findViewById(R.id.WiFiISPET).setEnabled(false);
+            ISPName.setText(seenBefore.second);
+            ISPName.setEnabled(false);
             newNetworkIcon.setVisibility(View.GONE);
-            rootView.findViewById(R.id.SSIDNameSaveButton).setVisibility(View.INVISIBLE);
         }
         else
         {
+            saveData.setVisibility(View.VISIBLE);
             newNetworkIcon.setVisibility(View.VISIBLE);
             Animation shakeIt = AnimationUtils.loadAnimation(getActivity(), R.anim.wobble);
             newNetworkIcon.startAnimation(shakeIt);
@@ -139,9 +146,62 @@ public class WirelessConfigFragment extends Fragment
                     v.startAnimation(shakeIt);
                 }
             });
+
+            saveData.setVisibility(View.VISIBLE);
+
+            new AsyncTask<Void, Void, Pair<String,String>>()
+            {
+                @Override
+                protected Pair<String,String> doInBackground(Void... params)
+                {
+                    return API.getISPMeta();
+                }
+
+                @Override
+                protected void onPostExecute(Pair<String,String> ispMeta)
+                {
+                    LocalCache lc = null;
+                    try
+                    {
+                        WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+                        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+
+                        lc = new LocalCache(getActivity());
+                        lc.open();
+                        lc.addSSID(wifiInfo.getSSID().replaceAll("\"",""),ispMeta.second);
+
+                        ISPName.setText(ispMeta.second);
+                        Animation animationFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fadeout);
+                        newNetworkIcon.startAnimation(animationFadeOut);
+                        animationFadeOut.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation)
+                            {
+                                newNetworkIcon.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+
+                        saveData.setVisibility(View.INVISIBLE);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute();
         }
 
-        ISPName = ((EditText) rootView.findViewById(R.id.WiFiISPET));
+        /*ISPName = ((EditText) rootView.findViewById(R.id.WiFiISPET));
         rootView.findViewById(R.id.SSIDNameSaveButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v)
@@ -191,10 +251,9 @@ public class WirelessConfigFragment extends Fragment
                 if(null != lc)
                     lc.close();
             }
-        });
+        });*/
 
         //Checkbox for sending this along
-        saveData = rootView.findViewById(R.id.progressBar);
         ((CheckBox) rootView.findViewById(R.id.sendDataCB)).setChecked(settings.getBoolean("sendISPMeta", true));
         ((CheckBox) rootView.findViewById(R.id.sendDataCB)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

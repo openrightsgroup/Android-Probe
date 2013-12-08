@@ -19,8 +19,10 @@
 package uk.bowdlerize.service;
 
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,9 +31,13 @@ import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
+
+import com.google.android.gms.internal.ca;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -56,8 +62,12 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
+
+import static uk.bowdlerize.support.Hashes.MD5;
 
 public class CensorCensusService extends Service
 {
@@ -74,7 +84,7 @@ public class CensorCensusService extends Service
     DefaultHttpClient client;
     HttpHead headRequest;
     HttpResponse response = null;
-
+    API api = null;
 
     @Override
     public IBinder onBind(Intent intent)
@@ -85,49 +95,87 @@ public class CensorCensusService extends Service
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId)
     {
-        mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mBuilder = new NotificationCompat.Builder(this);
+        if(null == mNotifyManager)
+            mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if(null == mBuilder)
+            mBuilder = new NotificationCompat.Builder(this);
+
+        if(null == api)
+            api = new API(this);
+
         mContext = this;
 
         checkedCount = getPreferences(this).getInt("checkedCount", 0);
         censoredCount = getPreferences(this).getInt("censoredCount", 0);
         sendtoORG  = getPreferences(this).getBoolean("sendToOrg", false);
 
-        //If this is user submitted send it up for further research
-        new Thread
-        (
-            new Runnable()
+        //Lets findout why we've been started
+        if(intent.getBooleanExtra(API.EXTRA_POLL,false) || intent.getBooleanExtra(API.EXTRA_GCM_TICKLE,false))
+        {
+            prepProbe(intent);
+        }
+        else if(intent.hasExtra("url") && !intent.getStringExtra("url").equals(""))
+        {
+            performProbe(intent);
+        }
+        else
+        {
+            onProbeFinish();
+        }
+
+        //If we're polling we probably want to stay alive
+        if(getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getInt(API.SETTINGS_GCM_PREFERENCE,API.SETTINGS_GCM_FULL) == API.SETTINGS_GCM_DISABLED)
+        {
+            return START_STICKY;
+        }
+        else
+        {
+            return START_NOT_STICKY;
+        }
+    }
+
+    private void prepProbe(final Intent intent)
+    {
+        new Thread()
+        {
+            public void run()
             {
-                @Override
+                String url;
+                String hash;
+                try
+                {
+                    url = api.getURLBasic();
+                    hash = MD5(url);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    url = null;
+                    hash = ".....";
+                }
+
+                intent.putExtra("url",url);
+                intent.putExtra("hash",hash);
+
+                performProbe(intent);
+            }
+        }.start();
+    }
+
+    private void performProbe(final Intent intent)
+    {
+        //If this is user submitted send it up for further research
+        if(intent.getBooleanExtra("local",false))
+        {
+            new Thread()
+            {
                 public void run()
                 {
-                    if(intent.getBooleanExtra("local",false))
-                    {
-                        submitURL(intent.getStringExtra("url"));
-
-                        if(sendtoORG)
-                        {
-                            //TODO Also send this URL upstream to ORG
-                        }
-                    }
+                    try { api.submitURL(intent.getStringExtra("url")); } catch (Exception e) { e.printStackTrace(); }
                 }
-            }
-        ).start();
-
-        /*bR = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                Log.e("bR", "On receive!");
-                forceCancel = true;
-            }
-        };
-        this.registerReceiver(bR,new IntentFilter(INTENT_FILTER));
-
-        Intent cancelIntent = new Intent(INTENT_FILTER);
-        PendingIntent pt = PendingIntent.getBroadcast(this, 0, cancelIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        */
+            }.start();
+        }
 
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
                 .setBigContentTitle("Censor Census - URL Received")
@@ -139,7 +187,6 @@ public class CensorCensusService extends Service
                 .setPriority(Notification.PRIORITY_MAX)
                 .setTicker("Censor Census - URL Received")
                 .setAutoCancel(false);
-                //.addAction(R.drawable.ic_launcher,"Load Settings",pt)
 
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
 
@@ -150,7 +197,9 @@ public class CensorCensusService extends Service
                     @Override
                     public void run()
                     {
-                        //mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
+                        String url = intent.getStringExtra("url");
+                        String hash = intent.getStringExtra("hash");
+
                         Pair<Boolean,Integer> wasCensored;
 
                         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
@@ -159,7 +208,7 @@ public class CensorCensusService extends Service
                                 .setBigContentTitle("Censor Census - Checking URL")
                                 .addLine("Started at " + currentDateTimeString)
                                 .addLine("Checking URL.....")
-                                .addLine("MD5: " + intent.getStringExtra("hash"))
+                                .addLine("MD5: " + hash)
                                 .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
                         );
                         mBuilder.setProgress(2,1,true);
@@ -167,8 +216,11 @@ public class CensorCensusService extends Service
 
                         try
                         {
+                            if(null == url)
+                                throw new NullPointerException();
+
                             //Do the actual check
-                            wasCensored = checkURL(intent.getStringExtra("url"));
+                            wasCensored = checkURL(url);
 
                             //We're complete - update the time
                             currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
@@ -222,46 +274,35 @@ public class CensorCensusService extends Service
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
 
                         //Send the details back regardless (will chew DB space but will give a clearer picture)
-                        notifyBackEnd(intent.getStringExtra("hash"),"",wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
+                        notifyBackEnd(hash,"",wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
 
                         if(sendtoORG)
-                            notifyORG(intent.getStringExtra("url"),wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
+                            notifyOONIDirectly(url,wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
 
-                        stopSelf();
+                        onProbeFinish();
                     }
                 }
         ).start();
-
-
-        return START_NOT_STICKY;
     }
 
-
-    private void submitURL(String submittedURL)
+    private void onProbeFinish()
     {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        JSONObject json;
-        HttpPost httpost = new HttpPost("https://bowdlerize.co.uk/api/1/submiturl.php");
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent i = new Intent(CensorCensusService.this, CensorCensusService.class);
+        i.putExtra(API.EXTRA_POLL,true);
+        PendingIntent pi = PendingIntent.getService(CensorCensusService.this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        httpost.setHeader("Accept", "application/json");
-
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        nvps.add(new BasicNameValuePair("url", submittedURL));
-
-        try
+        //If we are polling lets set our next tick
+        if(getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getInt(API.SETTINGS_GCM_PREFERENCE,API.SETTINGS_GCM_FULL) == API.SETTINGS_GCM_DISABLED)
         {
-            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-            HttpResponse response = httpclient.execute(httpost);
-            String rawJSON = EntityUtils.toString(response.getEntity());
-            response.getEntity().consumeContent();
-            Log.e("rawJSON",rawJSON);
-            json = new JSONObject(rawJSON);
-
-            //TODO In future versions we'll check for success and store it for later if it failed
+            am.cancel(pi); // cancel any existing alarms
+            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 60000);
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime() + repeat, pi);
         }
-        catch(Exception e)
+        else
         {
-            e.printStackTrace();
+            am.cancel(pi); // cancel any existing alarms
+            stopSelf();
         }
     }
 
@@ -300,7 +341,7 @@ public class CensorCensusService extends Service
         }
     }
 
-    private void notifyORG(String url, Pair<Boolean,Integer> results,String ISP, String SIM)
+    private void notifyOONIDirectly(String url, Pair<Boolean,Integer> results,String ISP, String SIM)
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         JSONObject json;

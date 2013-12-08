@@ -23,10 +23,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Pair;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -62,9 +64,22 @@ public class API
     public static String USER_STATUS_OK = "ok";
     public static String USER_STATUS_FAILED = "failed";
 
-    public static String SETTINGS_EMAIL_ADDRESS = "emailAddress";
-    public static String SETTINGS_USER_PRIVATE_KEY = "userPrivKey";
-    public static String SETTINGS_PROBE_PRIVATE_KEY = "probePrivKey";
+    public static final String SETTINGS_EMAIL_ADDRESS = "emailAddress";
+    public static final String SETTINGS_USER_PRIVATE_KEY = "userPrivKey";
+    public static final String SETTINGS_PROBE_PRIVATE_KEY = "probePrivKey";
+    public static final String SETTINGS_GCM_PREFERENCE = "gcm_pref";
+    public static final String SETTINGS_UUID = "probe_uuid";
+    public static final String SETTINGS_FREQUENCY = "frequency";
+    public static final String SETTINGS_FREQUENCY_SEEK = "frequency_seek";
+
+    public static final String EXTRA_POLL = "poll_for_url";
+    public static final String EXTRA_GCM_TICKLE = "gcm_tickle";
+
+    public static final String PROPERTY_REG_ID = "registration_id";
+
+    public static final int SETTINGS_GCM_FULL = 0;
+    public static final int SETTINGS_GCM_PARTIAL = 1;
+    public static final int SETTINGS_GCM_DISABLED = 2;
 
     private SharedPreferences settings = null;
 
@@ -151,6 +166,81 @@ public class API
         }
     }
 
+    public String getURLBasic() throws NoSuchPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, SignatureException
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+        /*HttpPost httpost = new HttpPost("https://bowdlerize.co.uk/api/1.1/request/httpt");
+
+        httpost.setHeader("Accept", "application/json");
+        String uuid = settings.getString(SETTINGS_UUID,"");
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("probe_uuid", uuid));
+        nvps.add(new BasicNameValuePair("basic", "true"));
+        nvps.add(new BasicNameValuePair("signature", SignHeaders(uuid)));*/
+
+        HttpGet httpGet = new HttpGet("https://bowdlerize.co.uk/api/1.1/request/httpt");
+
+        httpGet.setHeader("Accept", "application/json");
+
+        try
+        {
+            //httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+            HttpResponse response = httpclient.execute(httpGet);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("rawJSON",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            if(json.getBoolean("success"))
+            {
+                return json.getString("url");
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean submitURL(String url) throws NoSuchPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, SignatureException
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+        HttpPost httpost = new HttpPost("https://bowdlerize.co.uk/api/1.1/submit/url");
+
+        httpost.setHeader("Accept", "application/json");
+
+        String emailAddress = settings.getString(SETTINGS_EMAIL_ADDRESS,"");
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("email", emailAddress));
+        nvps.add(new BasicNameValuePair("url", url));
+        nvps.add(new BasicNameValuePair("signature", SignHeaders(url)));
+
+        try
+        {
+            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+            HttpResponse response = httpclient.execute(httpost);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("rawJSON",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            return json.getBoolean("success");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public String prepareProbe() throws NoSuchPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, SignatureException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -233,9 +323,91 @@ public class API
         }
     }
 
+    public static Pair<String,String> getISPMeta()
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+        HttpGet httpget = new HttpGet("http://wtfismyip.com/json");
+        httpget.setHeader("Accept", "application/json");
+
+        try
+        {
+            HttpResponse response = httpclient.execute(httpget);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("rawJSON",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            return new Pair(json.getString("YourFuckingLocation"),json.getString("YourFuckingISP"));
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return new Pair(null,null);
+        }
+    }
+
+    public Boolean updateGCM(int type, int frequency) throws NoSuchPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, SignatureException
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+        HttpPost httpost = new HttpPost("https://bowdlerize.co.uk/api/1.1/update/gcm");
+
+        httpost.setHeader("Accept", "application/json");
+
+        String emailAddress = settings.getString(SETTINGS_EMAIL_ADDRESS,"");
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID,"")));
+        nvps.add(new BasicNameValuePair("frequency", Integer.toString(frequency)));
+        nvps.add(new BasicNameValuePair("gcm_id", settings.getString(API.PROPERTY_REG_ID,"")));
+        nvps.add(new BasicNameValuePair("gcm_type", Integer.toString(type)));
+        nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(API.PROPERTY_REG_ID,""),false)));
+
+        Log.e("GCM",settings.getString(API.PROPERTY_REG_ID,""));
+        try
+        {
+            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+            HttpResponse response = httpclient.execute(httpost);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("update gcm json",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            try
+            {
+                return json.getBoolean("success");
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private String SignHeaders(String dataToSign) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, SignatureException
     {
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.decode(settings.getString(SETTINGS_USER_PRIVATE_KEY,"").getBytes(), 0));
+        Log.e("SignHeaders",dataToSign);
+        return SignHeaders(dataToSign,true);
+    }
+
+    private String SignHeaders(String dataToSign, boolean isUser) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, SignatureException
+    {
+        PKCS8EncodedKeySpec spec;
+        if(isUser)
+        {
+            spec = new PKCS8EncodedKeySpec(Base64.decode(settings.getString(SETTINGS_USER_PRIVATE_KEY,"").getBytes(), 0));
+        }
+        else
+        {
+            spec = new PKCS8EncodedKeySpec(Base64.decode(settings.getString(SETTINGS_PROBE_PRIVATE_KEY,"").getBytes(), 0));
+        }
+
         KeyFactory kf = KeyFactory.getInstance("RSA","BC");
         PrivateKey pk = kf.generatePrivate(spec);
         byte[] signed = null;
@@ -247,9 +419,12 @@ public class API
         instance.update(dataToSign.getBytes());
         signed = instance.sign();
 
-        //Log.e("privateKey",settings.getString(SETTINGS_USER_PRIVATE_KEY,""));
+        Log.e("privateKey",settings.getString(SETTINGS_USER_PRIVATE_KEY,""));
+        Log.e("privateKey",settings.getString(SETTINGS_PROBE_PRIVATE_KEY,""));
         //Log.e("Signature",Base64.encodeToString(signed, Base64.NO_WRAP));
 
         return Base64.encodeToString(signed, Base64.NO_WRAP);
     }
+
+
 }

@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Minimum Delay"
+        android:text="@string/checkFrequencyLabel"
         android:id="@+id/delayLabel"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true" />
@@ -24,8 +24,8 @@
         android:layout_below="@+id/delayLabel"
         android:layout_marginTop="12dp"
         android:layout_centerHorizontal="true"
-        android:progress="1"
-        android:max="1440" />
+        android:progress="0"
+        android:max="10" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -43,15 +43,49 @@
         android:id="@+id/ccEnabled"
         android:layout_below="@+id/delayValueLabel"
         android:layout_alignLeft="@+id/seekBar"
-        android:layout_marginTop="30dp" />
+        android:layout_marginTop="30dp"
+        android:visibility="invisible" />
 
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progressBar"
+        android:visibility="invisible"
+        android:layout_below="@+id/delayValueLabel"
+        android:layout_alignParentLeft="false"
+        android:layout_centerHorizontal="true" />
+
+    <RadioGroup
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_below="@+id/ccEnabled"
-        android:layout_centerHorizontal="true"
-        android:visibility="invisible" />
+        android:layout_alignParentLeft="true"
+        android:id="@+id/radioGroupConfig">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioGCMFull"
+            android:id="@+id/gcmFull"
+            android:enabled="true"
+            android:checked="true" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioGCMPartial"
+            android:id="@+id/gcmPartial"
+            android:enabled="true"
+            android:layout_marginTop="20dp" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/radioPoll"
+            android:id="@+id/gcmNone"
+            android:enabled="true"
+            android:layout_marginTop="20dp" />
+    </RadioGroup>
 
 </RelativeLayout>
 </ScrollView>

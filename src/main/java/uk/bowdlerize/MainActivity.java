@@ -143,7 +143,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
     }
 
-
     private void onConfirmed()
     {
         if (checkPlayServices())
@@ -236,18 +235,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     regid = gcm.register(SENDER_ID);
                     msg = "Device registered, registration ID=" + regid;
 
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
-                    sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
-
                     // Persist the regID - no need to register again.
                     storeRegistrationId(context, regid);
+
+                    sendRegistrationIdToBackend();
                 }
                 catch (IOException ex)
                 {
@@ -270,45 +261,22 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     private void sendRegistrationIdToBackend()
     {
-        new AsyncTask<Void, Void, Boolean>()
+        new Thread()
         {
-            @Override
-            protected Boolean doInBackground(Void... params)
+            public void run()
             {
-                DefaultHttpClient httpclient = new DefaultHttpClient();
-                JSONObject json;
-                HttpPost httpost = new HttpPost("https://bowdlerize.co.uk/api/1/updategcm.php");
-
-                httpost.setHeader("Accept", "application/json");
-
-                List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-                nvps.add(new BasicNameValuePair("gcmid", regid));
-                nvps.add(new BasicNameValuePair("deviceid", MD5(Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID))));
-
+                API api;
                 try
                 {
-                    httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
-                    HttpResponse response = httpclient.execute(httpost);
-                    String rawJSON = EntityUtils.toString(response.getEntity());
-                    response.getEntity().consumeContent();
-                    Log.e("rawJSON",rawJSON);
-                    json = new JSONObject(rawJSON);
+                    api = new API(MainActivity.this);
+                    api.updateGCM(settings.getInt(API.SETTINGS_GCM_PREFERENCE,API.SETTINGS_GCM_FULL),settings.getInt("maxDelay",2));
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     e.printStackTrace();
                 }
-
-                return true;
             }
-
-            @Override
-            protected void onPostExecute(Boolean success)
-            {
-                //TODO if it fails we should reregister
-            }
-        }.execute(null, null, null);
+        }.start();
     }
 
     private static int getAppVersion(Context context)
@@ -325,8 +293,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     {
         final SharedPreferences prefs = getGCMPreferences(context);
         int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
-        Log.i(TAG, "regId" + regId);
+        //Log.i(TAG, "Saving regId on app version " + appVersion);
+        //Log.i(TAG, "regId" + regId);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
