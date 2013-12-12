@@ -35,17 +35,10 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import uk.bowdlerize.fragments.CheckConfigFragment;
 import uk.bowdlerize.fragments.CreateUserFragment;
 import uk.bowdlerize.fragments.OrgFragment;
-import uk.bowdlerize.fragments.StatsFragment;
-import uk.bowdlerize.fragments.WirelessConfigFragment;
 
 
 public class SetupActivity extends Activity implements ActionBar.TabListener, CreateUserFragment.Callbacks, OrgFragment.Callbacks
@@ -57,7 +50,6 @@ public class SetupActivity extends Activity implements ActionBar.TabListener, Cr
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     String SENDER_ID = "974943648388";
     static final String TAG = "MainActivity";
-    GoogleCloudMessaging gcm;
     AtomicInteger msgId = new AtomicInteger();
     SharedPreferences prefs;
     Context context;

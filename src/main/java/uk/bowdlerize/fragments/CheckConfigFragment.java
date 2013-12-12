@@ -221,6 +221,13 @@ public class CheckConfigFragment extends Fragment
             gcmNone.setChecked(false);
         }
 
+        //If this is the version without Google Play services then disable the GCM options
+        if(settings.getBoolean("no_google_play_services",false))
+        {
+            gcmFull.setEnabled(false);
+            gcmPartial.setEnabled(false);
+        }
+
         ((RadioGroup) rootView.findViewById(R.id.radioGroupConfig)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
         {
             @Override

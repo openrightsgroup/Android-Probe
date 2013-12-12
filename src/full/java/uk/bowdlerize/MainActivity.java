@@ -117,6 +117,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         getActionBar().setIcon(R.drawable.ic_ab_alt);
 
         settings = getGCMPreferences(this);
+        Log.e("VERSION","HAS GOOGLE PLAY");
+        //Define that this is the version that uses google play services
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("no_google_play_services",false);
+        editor.commit();
 
         //Check if the user has agreed to the T&Cs / has a private key for themselves and the probe
         if(settings.getBoolean("agreed",false) && !settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"").equals("") && !settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY,"").equals(""))
@@ -149,35 +154,30 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     {
         if (checkPlayServices())
         {
-
-            configureTabs();
-
-            gcm = GoogleCloudMessaging.getInstance(this);
-            regid = getRegistrationId(context);
-
-            if (regid.isEmpty())
-            {
-                registerInBackground();
-            }
-            else
-            {
-                Log.i(TAG, "regid:"+regid);
-                sendRegistrationIdToBackend();
-            }
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("no_google_play_services",false);
+            editor.commit();
         }
         else
         {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-            try
-            {
-                Toast.makeText(MainActivity.this,"Google Play Services is needed for this game",Toast.LENGTH_LONG).show();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("no_google_play_services",true);
+            editor.commit();
+        }
 
-            finish();
+        configureTabs();
+
+        gcm = GoogleCloudMessaging.getInstance(this);
+        regid = getRegistrationId(context);
+
+        if (regid.isEmpty())
+        {
+            registerInBackground();
+        }
+        else
+        {
+            Log.i(TAG, "regid:"+regid);
+            sendRegistrationIdToBackend();
         }
     }
 
@@ -192,8 +192,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             }
             else
             {
-                Log.i(TAG, "This device is not supported.");
-                finish();
+                /*Log.i(TAG, "This device is not supported.");
+                finish();*/
             }
             return false;
         }
@@ -208,6 +208,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             Log.i(TAG, "Registration not found.");
             return "";
         }
+
         // Check if app was updated; if so, it must clear the registration ID
         // since the existing regID is not guaranteed to work with the new
         // app version.

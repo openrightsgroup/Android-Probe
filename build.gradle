@@ -1,0 +1,82 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.0"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 19
+    }
+
+    final Console console = System.console();
+
+    if (console != null)
+    {
+        signingConfigs
+        {
+            release
+            {
+                storeFile file(console.readLine(" Enter keystore path: "))
+                storePassword console.readLine(" Enter keystore password: ")
+                keyAlias "Primary"
+                keyPassword console.readLine(" Enter key password: ")
+            }
+        }
+    }
+    else
+    {
+        // Building from IDE's "Run" button
+        signingConfigs
+        {
+            release
+            {
+
+            }
+        }
+
+    }
+
+    productFlavors
+    {
+        foss
+        {
+            packageName "uk.bowdlerize.foss"
+        }
+
+        full
+        {
+
+        }
+    }
+
+    buildTypes
+    {
+        release
+        {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies
+{
+
+	    fullCompile 'com.android.support:support-v13:+',
+            'com.google.android.gms:play-services:3.1.36'
+
+
+        fossCompile 'com.android.support:support-v13:+'
+}
