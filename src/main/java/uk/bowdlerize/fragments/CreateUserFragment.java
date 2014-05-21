@@ -119,7 +119,8 @@ public class CreateUserFragment extends Fragment
         else
         {
             //Set the EditText variables we need
-            privKeyET.setText("-----BEGIN RSA PRIVATE KEY-----\n" + privKey + "\n-----END RSA PRIVATE KEY-----");
+            //privKeyET.setText("-----BEGIN RSA PRIVATE KEY-----\n" + privKey + "\n-----END RSA PRIVATE KEY-----");
+            privKeyET.setText(privKey);
             privKeyET.setEnabled(false);
             emailAddressET.setText(settings.getString(API.SETTINGS_EMAIL_ADDRESS,""));
             emailAddressET.setEnabled(false);
@@ -189,12 +190,12 @@ public class CreateUserFragment extends Fragment
                 }
                 else
                 {
-                    String tmpPK = privKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
+                    /*String tmpPK = privKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
                     tmpPK = tmpPK.replace("-----END RSA PRIVATE KEY-----", "");
-                    tmpPK = tmpPK.replace("\n", "");
+                    tmpPK = tmpPK.replace("\n", "");*/
 
                     SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(API.SETTINGS_USER_PRIVATE_KEY,tmpPK);
+                    editor.putString(API.SETTINGS_USER_PRIVATE_KEY,privKey);
                     editor.putString(API.SETTINGS_EMAIL_ADDRESS,emailAddressET.getText().toString());
                     editor.commit();
 

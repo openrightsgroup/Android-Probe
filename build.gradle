@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
 apply plugin: 'android'
@@ -21,6 +21,13 @@ android {
         targetSdkVersion 19
     }
 
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
     final Console console = System.console();
 
     if (console != null)
@@ -31,7 +38,7 @@ android {
             {
                 storeFile file(console.readLine(" Enter keystore path: "))
                 storePassword console.readLine(" Enter keystore password: ")
-                keyAlias "Primary"
+                keyAlias "Release"
                 keyPassword console.readLine(" Enter key password: ")
             }
         }
@@ -58,7 +65,7 @@ android {
 
         full
         {
-
+            packageName "uk.org.blocked.app"
         }
     }
 

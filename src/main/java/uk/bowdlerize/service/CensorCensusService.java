@@ -36,10 +36,13 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.Pair;
 import org.apache.http.Header;
+import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
@@ -47,20 +50,25 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
+import uk.bowdlerize.support.CensoredException;
 
 import static uk.bowdlerize.support.Hashes.MD5;
 
@@ -78,6 +86,7 @@ public class CensorCensusService extends Service
     boolean sendtoORG = false;
     DefaultHttpClient client;
     HttpHead headRequest;
+    HttpGet httpGet;
     HttpResponse response = null;
     API api = null;
 
@@ -142,20 +151,38 @@ public class CensorCensusService extends Service
                 {
                     url = api.getURLBasic();
                     hash = MD5(url);
+
+                    intent.putExtra("url",url);
+                    intent.putExtra("hash",hash);
+
+                    performProbe(intent);
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                     url = null;
                     hash = ".....";
+                    warnOnError();
                 }
-
-                intent.putExtra("url",url);
-                intent.putExtra("hash",hash);
-
-                performProbe(intent);
             }
         }.start();
+    }
+
+    private void warnOnError()
+    {
+        mBuilder.setStyle(new NotificationCompat.InboxStyle()
+                .setBigContentTitle("Censor Census - Error")
+                .addLine("There was an error getting the URL")
+                .addLine("--------------")
+                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
+                .setSmallIcon(R.drawable.ic_stat_in_progress)
+                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
+                .setPriority(Notification.PRIORITY_MAX)
+                .setTicker("Censor Census - Error")
+                .setAutoCancel(false);
+
+        mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
+
     }
 
     private void performProbe(final Intent intent)
@@ -269,11 +296,11 @@ public class CensorCensusService extends Service
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
 
                         //Send the details back regardless (will chew DB space but will give a clearer picture)
-                        notifyBackEnd(hash,"",wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
+                        notifyBackEnd(url,"",wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
 
-                        if(sendtoORG)
+                        /*if(sendtoORG)
                             notifyOONIDirectly(url,wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
-
+                        */
                         onProbeFinish();
                     }
                 }
@@ -301,21 +328,43 @@ public class CensorCensusService extends Service
         }
     }
 
-    private void notifyBackEnd(String md5Hash, String hmac, Pair<Boolean,Integer> results,String ISP, String SIM)
+    private void notifyBackEnd(String url, String hmac, Pair<Boolean,Integer> results,String ISP, String SIM)
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         JSONObject json;
-        HttpPost httpost = new HttpPost("https://bowdlerize.co.uk/api/1/receiveresult.php");
+        HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
 
-        Log.e("notifyBackend",md5Hash + " / " + Boolean.toString(results.first));
+        //Log.e("notifyBackend",url + " / " + Boolean.toString(results.first));
         httpost.setHeader("Accept", "application/json");
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        nvps.add(new BasicNameValuePair("md5", md5Hash));
-        nvps.add(new BasicNameValuePair("hmac", hmac));
-        nvps.add(new BasicNameValuePair("isp", ISP));
-        nvps.add(new BasicNameValuePair("sim", SIM));
-        nvps.add(new BasicNameValuePair("censored", Boolean.toString(results.first)));
+        nvps.add(new BasicNameValuePair("probe_uuid", getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getString(API.SETTINGS_UUID,"")));
+        nvps.add(new BasicNameValuePair("url", url));
+        if(((Boolean) results.first) == true)
+        {
+            nvps.add(new BasicNameValuePair("status", "blocked"));
+        }
+        else
+        {
+            nvps.add(new BasicNameValuePair("status", "ok"));
+        }
+        SimpleDateFormat sDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sDF.setTimeZone(TimeZone.getTimeZone("utc"));
+        nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
+        nvps.add(new BasicNameValuePair("config", "1"));
+        try
+        {
+            nvps.add(new BasicNameValuePair("signature", API.SignHeaders(getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getString(API.SETTINGS_PROBE_PRIVATE_KEY, ""), nvps)));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("signature",""));
+        }
+
+        nvps.add(new BasicNameValuePair("ip_network", "1.1.1.1"));
+        nvps.add(new BasicNameValuePair("network_name", ISP));
+        nvps.add(new BasicNameValuePair("http_status", "0"));
+
         nvps.add(new BasicNameValuePair("confidence", Integer.toString(results.second)));
 
         try
@@ -325,7 +374,7 @@ public class CensorCensusService extends Service
             HttpResponse response = httpclient.execute(httpost);
             String rawJSON = EntityUtils.toString(response.getEntity());
             response.getEntity().consumeContent();
-            Log.e("rawJSON",rawJSON);
+            Log.e("API Raw JSON",rawJSON);
             json = new JSONObject(rawJSON);
 
             //TODO In future versions we'll check for success and store it for later if it failed
@@ -400,7 +449,7 @@ public class CensorCensusService extends Service
             HttpResponse response = httpclient.execute(httpost);
             String rawJSON = EntityUtils.toString(response.getEntity());
             response.getEntity().consumeContent();
-            Log.e("rawJSON",rawJSON);
+            Log.e("ooni rawJSON",rawJSON);
             json = new JSONObject(rawJSON);
 
             //TODO In future versions we'll check for success and store it for later if it failed
@@ -452,12 +501,80 @@ public class CensorCensusService extends Service
 
         client = new DefaultHttpClient();
 
-        headRequest = new HttpHead(checkURL);
-        headRequest.setHeader("User-Agent", "OONI Android Probe");
+        /*headRequest = new HttpHead(checkURL);
+        headRequest.setHeader("User-Agent", "OONI Android Probe");*/
+
+        httpGet = new HttpGet(checkURL);
+        httpGet.setHeader("User-Agent", "OONI Android Probe");
 
         try
         {
-            response = client.execute(headRequest);
+            //response = client.execute(headRequest);
+            client.addResponseInterceptor( new HttpResponseInterceptor() {
+                @Override
+                public void process(HttpResponse httpResponse, HttpContext httpContext) throws HttpException, IOException
+                {
+                    if(httpResponse.getStatusLine().getStatusCode() == 302 || httpResponse.getStatusLine().getStatusCode() == 301)
+                    {
+                        for(Header hdr : httpResponse.getAllHeaders())
+                        {
+                            if(hdr.getName().toString().equals("Location"))
+                            {
+                                if(hdr.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html"))
+                                {
+                                    Log.e("Blocked", "Blocked by EE");
+                                    throw new CensoredException("Blocked by EE","EE",100);
+                                }
+                                else if (hdr.getValue().contains("http://www.t-mobile.co.uk/service/wnw-mig/entry/") || hdr.getValue().contains("http://tmobile.ee.co.uk/common/system_error_pages/outage_wnw.html"))
+                                {
+                                    Log.e("Blocked", "Blocked by TMobile");
+                                    throw new CensoredException("Blocked by TMobile","TMobile",100);
+                                }
+                                else if (hdr.getValue().contains("http://online.vodafone.co.uk/dispatch/Portal/ContentControlServlet?type=restricted"))
+                                {
+                                    Log.e("Blocked", "Blocked by Vodafone");
+                                    throw new CensoredException("Blocked by Vodafone","Vodafone",100);
+                                }
+                                else if (hdr.getValue().contains("http://blockpage.bt.com/pcstaticpage/blocked.html"))
+                                {
+                                    Log.e("Blocked", "Blocked by BT");
+                                    throw new CensoredException("Blocked by BT","BT",100);
+                                }
+                                else if (hdr.getValue().contains("http://www.talktalk.co.uk/notice/parental-controls?accessurl"))
+                                {
+                                    Log.e("Blocked", "Blocked by TalkTalk");
+                                    throw new CensoredException("Blocked by TalkTalk","TalkTalk",100);
+                                }
+                                else if (hdr.getValue().equals("http://www.plus.net/support/security/abuse/blocked.shtml"))
+                                {
+                                    Log.e("Blocked", "Blocked by PlusNet");
+                                    throw new CensoredException("Blocked by PlusNet","PlusNet",100);
+                                }
+                            }
+                        }
+                    }
+
+                    /*Log.e("intercepted return code",httpResponse.getStatusLine().toString());
+
+                    for(Header hdr : httpResponse.getAllHeaders())
+                    {
+                        Log.e("intercepted header",hdr.getName().toString() + " / " + hdr.getValue().toString());
+                    }
+                    Log.e("intercepted header","------------------\r\n------------------\r\n------------------\r\n------------------\r\n------------------\r\n");*/
+
+                }
+            });
+            response = client.execute(httpGet);
+        }
+        //This is the best case scenario!
+        catch (CensoredException CE)
+        {
+            return new Pair(true,100);
+        }
+        catch(UnknownHostException uhe)
+        {
+            uhe.printStackTrace();
+            return new Pair(false,50);
         }
         catch(ConnectTimeoutException CTE)
         {
@@ -503,6 +620,8 @@ public class CensorCensusService extends Service
         {
             Log.e("checkURL header",hdr.getName().toString() + " / " + hdr.getValue().toString());
         }
+
+
 
         return new Pair(false,1);
     }

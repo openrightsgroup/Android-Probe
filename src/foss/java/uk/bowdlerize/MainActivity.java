@@ -355,7 +355,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     @Override
                     public void onClick(DialogInterface dialog, int id)
                     {
-                        String probeKey = "-----BEGIN RSA PRIVATE KEY-----\n" + settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found") + "\n-----END RSA PRIVATE KEY-----";
+                        //String probeKey = "-----BEGIN RSA PRIVATE KEY-----\n" + settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found") + "\n-----END RSA PRIVATE KEY-----";
+                        String probeKey = settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found");
 
                         ClipData clip = ClipData.newPlainText("Censorship Monitoring Project Probe Private Key",probeKey);
                         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);

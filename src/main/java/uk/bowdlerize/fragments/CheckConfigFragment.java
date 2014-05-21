@@ -226,6 +226,7 @@ public class CheckConfigFragment extends Fragment
         {
             gcmFull.setEnabled(false);
             gcmPartial.setEnabled(false);
+            //gcmNone.setChecked(true);
         }
 
         ((RadioGroup) rootView.findViewById(R.id.radioGroupConfig)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
@@ -304,6 +305,8 @@ public class CheckConfigFragment extends Fragment
                 editor.commit();
             }
         });
+
+
 
         return rootView;
 
