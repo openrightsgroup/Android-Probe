@@ -28,9 +28,16 @@ public class CensorPayload
     public static int CONFIDENCE_NONE = 0;
 
     private boolean isCensored = false;
+    private boolean wasError = false;
     private int confidence = 0;
     private String confidenceReason = "None";
     private int returnCode = 200;
+    public String URL = "";
+
+    public CensorPayload(String url)
+    {
+        URL = url;
+    }
 
     public CensorPayload(boolean _censored, int _confidence)
     {
@@ -38,7 +45,7 @@ public class CensorPayload
         confidence = _confidence;
     }
 
-    public CensorPayload(boolean _censored, int _confidence, String _reason,int response)
+    public CensorPayload(boolean _censored, int _confidence, String _reason, int response)
     {
         isCensored = _censored;
         confidence = _confidence;
@@ -46,15 +53,42 @@ public class CensorPayload
         returnCode = response;
     }
 
-    public boolean isCensored()
+    public void consumeError(String reason)
     {
-        return isCensored;
+        isCensored = false;
+        wasError = true;
+        returnCode = -1;
+        confidenceReason = reason;
     }
 
-    public boolean wasCensored()
+    public boolean wasError() { return wasError; }
+
+
+    public void consumeCensoredException(CensoredException exception)
     {
-        return isCensored;
+        returnCode = exception.returnCode;
+        isCensored = true;
+        confidenceReason = exception.getMessage();
+        confidence = exception.confidence;
     }
+
+    public void setCensored(Boolean censor_state)
+    {
+        isCensored = censor_state;
+    }
+
+    public void setConfidence(int conf)
+    {
+        confidence = conf;
+    }
+
+    public void setReturnCode(int code){ returnCode = code; }
+
+    public boolean isCensored() { return isCensored; }
+
+    public boolean wasCensored() { return isCensored; }
+
+    public int getConfidence() { return confidence; }
 
     public String getConfidenceReason()
     {

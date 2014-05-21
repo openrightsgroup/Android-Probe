@@ -44,6 +44,7 @@ import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
 import uk.bowdlerize.cache.LocalCache;
+import uk.bowdlerize.support.ISPMeta;
 
 public class WirelessConfigFragment extends Fragment
 {
@@ -77,6 +78,8 @@ public class WirelessConfigFragment extends Fragment
 
             if(simNet.equals(""))
                 simNet = "Unknown";
+
+            Log.e("SIM",simNet);
 
             ((TextView) rootView.findViewById(R.id.simNetwork)).setText(simNet);
         }
@@ -154,7 +157,9 @@ public class WirelessConfigFragment extends Fragment
                 @Override
                 protected Pair<String,String> doInBackground(Void... params)
                 {
-                    return API.getISPMeta();
+                    API api = new API(getActivity());
+                    ISPMeta ispMeta = api.getISPMeta();
+                    return new Pair<String,String>(ispMeta.ipAddress,ispMeta.ispName);
                 }
 
                 @Override

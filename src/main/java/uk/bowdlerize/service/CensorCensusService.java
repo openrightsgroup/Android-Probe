@@ -68,6 +68,7 @@ import java.util.TimeZone;
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
+import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.CensoredException;
 
 import static uk.bowdlerize.support.Hashes.MD5;
@@ -149,6 +150,7 @@ public class CensorCensusService extends Service
                 String hash;
                 try
                 {
+                    warnOnPrep();
                     url = api.getURLBasic();
                     hash = MD5(url);
 
@@ -168,6 +170,22 @@ public class CensorCensusService extends Service
         }.start();
     }
 
+    private void warnOnPrep()
+    {
+        mBuilder.setStyle(new NotificationCompat.InboxStyle()
+                .setBigContentTitle("Censor Census - Requesting URL")
+                .addLine("Requesting a URL for testing...")
+                .addLine("(Talking to blocked.org.uk )")
+                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
+                .setSmallIcon(R.drawable.ic_stat_in_progress)
+                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
+                .setPriority(Notification.PRIORITY_MAX)
+                .setTicker("Censor Census - Requesting URL")
+                .setAutoCancel(false);
+        mBuilder.setProgress(2,1,true);
+        mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
     private void warnOnError()
     {
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
@@ -182,7 +200,6 @@ public class CensorCensusService extends Service
                 .setAutoCancel(false);
 
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
-
     }
 
     private void performProbe(final Intent intent)
@@ -222,7 +239,8 @@ public class CensorCensusService extends Service
                         String url = intent.getStringExtra("url");
                         String hash = intent.getStringExtra("hash");
 
-                        Pair<Boolean,Integer> wasCensored;
+                        //Pair<Boolean,Integer> wasCensored;
+                        CensorPayload censorPayload;
 
                         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
@@ -242,15 +260,15 @@ public class CensorCensusService extends Service
                                 throw new NullPointerException();
 
                             //Do the actual check
-                            wasCensored = checkURL(url);
+                            censorPayload = checkURL(url);
 
                             //We're complete - update the time
                             currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
                             //Update our local stats
-                            setCounts(wasCensored.first);
+                            setCounts(censorPayload.wasCensored());
 
-                            if(wasCensored.first)
+                            if(censorPayload.wasCensored())
                             {
                                 mBuilder.setTicker("Found a possibly censored URL!");
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
@@ -287,7 +305,7 @@ public class CensorCensusService extends Service
                                     .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
                             );
 
-                            wasCensored = new Pair(false,0);
+                            censorPayload = null;
                         }
 
 
@@ -296,7 +314,8 @@ public class CensorCensusService extends Service
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
 
                         //Send the details back regardless (will chew DB space but will give a clearer picture)
-                        notifyBackEnd(url,"",wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
+                        //api.notifyBackEnd(url,"",wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
+                        api.notifyBackEnd(censorPayload);
 
                         /*if(sendtoORG)
                             notifyOONIDirectly(url,wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
@@ -319,71 +338,17 @@ public class CensorCensusService extends Service
         {
             am.cancel(pi); // cancel any existing alarms
             long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 60000);
+            Log.e("onProbeFinish",Long.toString(repeat));
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime() + repeat, pi);
         }
         else
         {
+            Log.e("onProbeFinish","Cancel everything!");
             am.cancel(pi); // cancel any existing alarms
             stopSelf();
         }
     }
 
-    private void notifyBackEnd(String url, String hmac, Pair<Boolean,Integer> results,String ISP, String SIM)
-    {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        JSONObject json;
-        HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
-
-        //Log.e("notifyBackend",url + " / " + Boolean.toString(results.first));
-        httpost.setHeader("Accept", "application/json");
-
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        nvps.add(new BasicNameValuePair("probe_uuid", getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getString(API.SETTINGS_UUID,"")));
-        nvps.add(new BasicNameValuePair("url", url));
-        if(((Boolean) results.first) == true)
-        {
-            nvps.add(new BasicNameValuePair("status", "blocked"));
-        }
-        else
-        {
-            nvps.add(new BasicNameValuePair("status", "ok"));
-        }
-        SimpleDateFormat sDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        sDF.setTimeZone(TimeZone.getTimeZone("utc"));
-        nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
-        nvps.add(new BasicNameValuePair("config", "1"));
-        try
-        {
-            nvps.add(new BasicNameValuePair("signature", API.SignHeaders(getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getString(API.SETTINGS_PROBE_PRIVATE_KEY, ""), nvps)));
-        }
-        catch (Exception e)
-        {
-            nvps.add(new BasicNameValuePair("signature",""));
-        }
-
-        nvps.add(new BasicNameValuePair("ip_network", "1.1.1.1"));
-        nvps.add(new BasicNameValuePair("network_name", ISP));
-        nvps.add(new BasicNameValuePair("http_status", "0"));
-
-        nvps.add(new BasicNameValuePair("confidence", Integer.toString(results.second)));
-
-        try
-        {
-            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
-            HttpResponse response = httpclient.execute(httpost);
-            String rawJSON = EntityUtils.toString(response.getEntity());
-            response.getEntity().consumeContent();
-            Log.e("API Raw JSON",rawJSON);
-            json = new JSONObject(rawJSON);
-
-            //TODO In future versions we'll check for success and store it for later if it failed
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
 
     private void notifyOONIDirectly(String url, Pair<Boolean,Integer> results,String ISP, String SIM)
     {
@@ -481,23 +446,22 @@ public class CensorCensusService extends Service
     }
 
     //Return whether the URL is censored and a confidence level (1-100)
-    private Pair<Boolean,Integer> checkURL(String checkURL) throws IllegalArgumentException, URISyntaxException
+    private CensorPayload checkURL(String checkURL) throws IllegalArgumentException, URISyntaxException
     {
-        if(!checkURL.startsWith("http"))
+        if (!checkURL.startsWith("http"))
             checkURL = "http://" + checkURL;
+
+        CensorPayload censorPayload = new CensorPayload(checkURL);
 
         Uri mUri = Uri.parse(checkURL);
 
-        if(null == mUri.getEncodedQuery())
-        {
+        if (null == mUri.getEncodedQuery()) {
             checkURL = mUri.getScheme() + "://" + mUri.getHost() + mUri.getPath();
-        }
-        else
-        {
-            checkURL = mUri.getScheme() + "://" + mUri.getHost() + mUri.getPath() +"?" + URLEncoder.encode(mUri.getEncodedQuery());
+        } else {
+            checkURL = mUri.getScheme() + "://" + mUri.getHost() + mUri.getPath() + "?" + URLEncoder.encode(mUri.getEncodedQuery());
         }
 
-        Log.e("Checking url",checkURL);
+        Log.e("Checking url", checkURL);
 
         client = new DefaultHttpClient();
 
@@ -507,48 +471,63 @@ public class CensorCensusService extends Service
         httpGet = new HttpGet(checkURL);
         httpGet.setHeader("User-Agent", "OONI Android Probe");
 
-        try
-        {
+        try {
             //response = client.execute(headRequest);
-            client.addResponseInterceptor( new HttpResponseInterceptor() {
+            client.addResponseInterceptor(new HttpResponseInterceptor() {
                 @Override
                 public void process(HttpResponse httpResponse, HttpContext httpContext) throws HttpException, IOException
                 {
-                    if(httpResponse.getStatusLine().getStatusCode() == 302 || httpResponse.getStatusLine().getStatusCode() == 301)
+                    if (httpResponse.getStatusLine().getStatusCode() == 302 || httpResponse.getStatusLine().getStatusCode() == 301)
                     {
-                        for(Header hdr : httpResponse.getAllHeaders())
+                        for (Header hdr : httpResponse.getAllHeaders())
                         {
-                            if(hdr.getName().toString().equals("Location"))
+                            if (hdr.getName().toString().equals("Location"))
                             {
-                                if(hdr.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html"))
+                                if (hdr.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html"))
                                 {
                                     Log.e("Blocked", "Blocked by EE");
-                                    throw new CensoredException("Blocked by EE","EE",100);
+                                    throw new CensoredException("Blocked by EE", "EE", 100);
                                 }
-                                else if (hdr.getValue().contains("http://www.t-mobile.co.uk/service/wnw-mig/entry/") || hdr.getValue().contains("http://tmobile.ee.co.uk/common/system_error_pages/outage_wnw.html"))
+                                else if (hdr.getValue().contains("http://www.t-mobile.co.uk/service/wnw-mig/entry/") ||
+                                         hdr.getValue().contains("http://tmobile.ee.co.uk/common/system_error_pages/outage_wnw.html"))
                                 {
                                     Log.e("Blocked", "Blocked by TMobile");
-                                    throw new CensoredException("Blocked by TMobile","TMobile",100);
+                                    throw new CensoredException("Blocked by TMobile", "TMobile", 100);
                                 }
                                 else if (hdr.getValue().contains("http://online.vodafone.co.uk/dispatch/Portal/ContentControlServlet?type=restricted"))
                                 {
                                     Log.e("Blocked", "Blocked by Vodafone");
-                                    throw new CensoredException("Blocked by Vodafone","Vodafone",100);
+                                    throw new CensoredException("Blocked by Vodafone", "Vodafone", 100);
                                 }
                                 else if (hdr.getValue().contains("http://blockpage.bt.com/pcstaticpage/blocked.html"))
                                 {
                                     Log.e("Blocked", "Blocked by BT");
-                                    throw new CensoredException("Blocked by BT","BT",100);
+                                    throw new CensoredException("Blocked by BT", "BT", 100);
                                 }
                                 else if (hdr.getValue().contains("http://www.talktalk.co.uk/notice/parental-controls?accessurl"))
                                 {
                                     Log.e("Blocked", "Blocked by TalkTalk");
-                                    throw new CensoredException("Blocked by TalkTalk","TalkTalk",100);
+                                    throw new CensoredException("Blocked by TalkTalk", "TalkTalk", 100);
                                 }
-                                else if (hdr.getValue().equals("http://www.plus.net/support/security/abuse/blocked.shtml"))
+                                else if (hdr.getValue().contains("http://www.plus.net/support/security/abuse/blocked.shtml"))
                                 {
                                     Log.e("Blocked", "Blocked by PlusNet");
-                                    throw new CensoredException("Blocked by PlusNet","PlusNet",100);
+                                    throw new CensoredException("Blocked by PlusNet", "PlusNet", 100);
+                                }
+                                else if (hdr.getValue().contains("http://mobile.three.co.uk/pc/Live/pcreator/live/100004/pin/blocked?"))
+                                {
+                                    Log.e("Blocked", "Blocked by Three");
+                                    throw new CensoredException("Blocked by Three", "Three", 100);
+                                }
+                                else if (hdr.getValue().contains("http://m.virginmedia.com/MiscPages/AdultWarning.aspx"))
+                                {
+                                    Log.e("Blocked", "Blocked by VirginMobile");
+                                    throw new CensoredException("Blocked by VirginMobile", "VirginMobile", 100);
+                                }
+                                else if (hdr.getValue().contains("http://assets.o2.co.uk/18plusaccess/"))
+                                {
+                                    Log.e("Blocked", "Blocked by O2");
+                                    throw new CensoredException("Blocked by O2", "O2", 100);
                                 }
                             }
                         }
@@ -567,64 +546,99 @@ public class CensorCensusService extends Service
             response = client.execute(httpGet);
         }
         //This is the best case scenario!
-        catch (CensoredException CE)
-        {
-            return new Pair(true,100);
+        catch (CensoredException CE) {
+            censorPayload.consumeCensoredException(CE);
+            return censorPayload;
         }
-        catch(UnknownHostException uhe)
-        {
+        catch (UnknownHostException uhe) {
             uhe.printStackTrace();
-            return new Pair(false,50);
+
+            /*censorPayload.setCensored(false);
+            censorPayload.setConfidence(50);*/
+            censorPayload.consumeError(uhe.getMessage());
+            return censorPayload;
         }
-        catch(ConnectTimeoutException CTE)
-        {
+        catch (ConnectTimeoutException CTE) {
             CTE.printStackTrace();
-            return new Pair(true,5);
+
+            /*censorPayload.setCensored(true);
+            censorPayload.setConfidence(5);*/
+            censorPayload.consumeError(CTE.getMessage());
+            return censorPayload;
         }
         catch (NoHttpResponseException NHRE)
         {
             NHRE.printStackTrace();
-            return new Pair(true,5);
+
+            /*censorPayload.setCensored(true);
+            censorPayload.setConfidence(5);*/
+            censorPayload.consumeError(NHRE.getMessage());
+            return censorPayload;
         }
         catch (IOException ioe)
         {
             ioe.printStackTrace();
-            return new Pair(false,0);
+
+            /*censorPayload.setCensored(false);
+            censorPayload.setConfidence(0);*/
+            censorPayload.consumeError(ioe.getMessage());
+            return censorPayload;
         }
-        catch (IllegalStateException ise)
-        {
+        catch (IllegalStateException ise) {
             ise.printStackTrace();
-            return new Pair(false,0);
+
+            censorPayload.setCensored(false);
+            censorPayload.setConfidence(0);
+            return censorPayload;
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
-            return new Pair(false,0);
+
+            censorPayload.setCensored(false);
+            censorPayload.setConfidence(0);
+            return censorPayload;
         }
 
         int statusCode = response.getStatusLine().getStatusCode();
 
-        Log.e("checkURL code",Integer.toString(statusCode));
-        if(statusCode == 403 || statusCode == 404 )
-            return new Pair(true,25);
+        censorPayload.setReturnCode(statusCode);
+
+        Log.e("checkURL code", Integer.toString(statusCode));
+        if (statusCode == 403 || statusCode == 404) {
+            censorPayload.setCensored(true);
+            censorPayload.setConfidence(25);
+            return censorPayload;
+        }
+        else if(statusCode == 504 || statusCode == 503 || statusCode == 500)
+        {
+            censorPayload.consumeError("Server Issue " + Integer.toString(statusCode));
+            return censorPayload;
+        }
 
         String phrase = response.getStatusLine().getReasonPhrase();
-        Log.e("checkURL phrase",phrase);
-        if(phrase.contains("orbidden"))
-            return new Pair(true,50);
+        Log.e("checkURL phrase", phrase);
+        if (phrase.contains("orbidden")) {
+            censorPayload.setCensored(true);
+            censorPayload.setConfidence(50);
+            return censorPayload;
+        }
 
-        if(phrase.contains("blocked"))
-            return new Pair(true,100);
+        if (phrase.contains("blocked")) {
+            censorPayload.setCensored(true);
+            censorPayload.setConfidence(100);
+            return censorPayload;
+        }
 
         for(Header hdr : response.getAllHeaders())
         {
             Log.e("checkURL header",hdr.getName().toString() + " / " + hdr.getValue().toString());
         }
 
-
-
-        return new Pair(false,1);
+        censorPayload.setCensored(false);
+        censorPayload.setConfidence(1);
+        return censorPayload;
     }
+
 
     private void saveCounts()
     {

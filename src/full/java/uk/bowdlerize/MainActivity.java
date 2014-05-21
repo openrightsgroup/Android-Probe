@@ -19,8 +19,6 @@
 package uk.bowdlerize;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import android.app.Activity;
@@ -38,7 +36,6 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.provider.Settings;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -49,25 +46,15 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
+
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.CheckConfigFragment;
-import uk.bowdlerize.fragments.OrgFragment;
 import uk.bowdlerize.fragments.StatsFragment;
 import uk.bowdlerize.fragments.WirelessConfigFragment;
 import uk.bowdlerize.service.CensorCensusService;
@@ -189,11 +176,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode))
             {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }
-            else
-            {
-                /*Log.i(TAG, "This device is not supported.");
-                finish();*/
             }
             return false;
         }
@@ -469,7 +451,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_privatekey:
             {
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 builder.setPositiveButton(R.string.action_user_key, new DialogInterface.OnClickListener()
@@ -477,7 +458,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     @Override
                     public void onClick(DialogInterface dialog, int id)
                     {
-                        String probeKey = "-----BEGIN RSA PRIVATE KEY-----\n" + settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found") + "\n-----END RSA PRIVATE KEY-----";
+                        //String probeKey = "-----BEGIN RSA PRIVATE KEY-----\n" + settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found") + "\n-----END RSA PRIVATE KEY-----";
+                        String probeKey = settings.getString(API.SETTINGS_USER_PRIVATE_KEY,"No key found");
 
                         ClipData clip = ClipData.newPlainText("Censorship Monitoring Project Probe Private Key",probeKey);
                         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);

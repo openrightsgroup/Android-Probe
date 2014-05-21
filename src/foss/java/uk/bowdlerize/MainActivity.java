@@ -18,9 +18,6 @@
 */
 package uk.bowdlerize;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import android.app.Activity;
@@ -37,8 +34,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
-import android.provider.Settings;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -49,22 +44,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.CheckConfigFragment;
-import uk.bowdlerize.fragments.OrgFragment;
 import uk.bowdlerize.fragments.StatsFragment;
 import uk.bowdlerize.fragments.WirelessConfigFragment;
 import uk.bowdlerize.service.CensorCensusService;
@@ -113,6 +96,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         getActionBar().setIcon(R.drawable.ic_ab_alt);
 
         settings = getGCMPreferences(this);
+
+        Log.e("ProbeUUID",settings.getString(API.SETTINGS_UUID,"No key found"));
+
 
         Log.e("VERSION","DOESN'T HAVE GOOGLE PLAY");
         //Define that this is the version that DOESN'T use google play services

@@ -164,12 +164,12 @@ public class OrgFragment extends Fragment
                 {
                     mCallbacks.updateStatus(PROBE_COMPLETE);
 
-                    String tmpPK = probePrivKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
+                    /*String tmpPK = probePrivKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
                     tmpPK = tmpPK.replace("-----END RSA PRIVATE KEY-----", "");
-                    tmpPK = tmpPK.replace("\n", "");
+                    tmpPK = tmpPK.replace("\n", "");*/
 
                     SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(API.SETTINGS_PROBE_PRIVATE_KEY,tmpPK);
+                    editor.putString(API.SETTINGS_PROBE_PRIVATE_KEY,probePrivKey);
                     editor.commit();
                     Toast.makeText(getActivity(),"Probe registration complete!",Toast.LENGTH_LONG).show();
 

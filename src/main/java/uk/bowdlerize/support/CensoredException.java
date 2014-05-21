@@ -6,6 +6,7 @@ public class CensoredException extends IOException
 {
     String isp = "";
     int confidence = 0;
+    int returnCode = 0;
 
     public CensoredException(String message)
     {

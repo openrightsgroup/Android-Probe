@@ -56,6 +56,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -64,6 +65,9 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
+
+import uk.bowdlerize.support.CensorPayload;
+import uk.bowdlerize.support.ISPMeta;
 
 public class API
 {
@@ -212,10 +216,10 @@ public class API
         nvps.add(new BasicNameValuePair("probe_uuid", uuid));
         nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(SETTINGS_PROBE_PRIVATE_KEY,""),nvps)));
 
-        nvps.add(new BasicNameValuePair("network_name", mobileNet));
-        Log.e("Test",mobileNet);
+        ISPMeta ispMeta = getISPMeta();
+
+        nvps.add(new BasicNameValuePair("network_name", ispMeta.ispName));
         nvps.add(new BasicNameValuePair("basic", "true"));
-        //nvps.add(new BasicNameValuePair("signature", SignHeaders(uuid)));
 
         HttpGet httpGet = new HttpGet("https://api.blocked.org.uk/1.2/request/httpt");
 
@@ -247,6 +251,44 @@ public class API
         }
     }
 
+    public ISPMeta getISPMeta()
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+
+        try
+        {
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
+            nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(SETTINGS_PROBE_PRIVATE_KEY,""),nvps)));
+            nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(SETTINGS_UUID,"")));
+
+            HttpGet httpGet = new HttpGet("https://api.blocked.org.uk/1.2/status/ip");
+            httpGet.setHeader("Accept", "application/json");
+
+            httpGet.setURI(new URI(httpGet.getURI() + "?" + URLEncodedUtils.format(nvps, "utf-8")));
+            HttpResponse response = httpclient.execute(httpGet);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("IP Raw JSON",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            if(json.getBoolean("success"))
+            {
+                return new ISPMeta(json.getString("ip"),json.getString("isp"));
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public boolean submitURL(String url) throws NoSuchPaddingException, UnsupportedEncodingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, SignatureException
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -257,12 +299,14 @@ public class API
 
         String emailAddress = settings.getString(SETTINGS_EMAIL_ADDRESS,"");
 
+        if(!url.startsWith("http"))
+            url = "http://" + url;
+
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("url", url));
         nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(SETTINGS_USER_PRIVATE_KEY,""),nvps)));
 
         nvps.add(new BasicNameValuePair("email", emailAddress));
-        //nvps.add(new BasicNameValuePair("signature", SignHeaders(url)));
 
         try
         {
@@ -369,27 +413,167 @@ public class API
         }
     }
 
-    public static Pair<String,String> getISPMeta()
+    @Deprecated
+    public void notifyBackEnd(String url, String hmac, Pair<Boolean,Integer> results,String ISP, String SIM)
     {
         DefaultHttpClient httpclient = new DefaultHttpClient();
         JSONObject json;
-        HttpGet httpget = new HttpGet("http://wtfismyip.com/json");
-        httpget.setHeader("Accept", "application/json");
+        ISPMeta ispMeta = getISPMeta();
+        HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
+
+        if(!url.startsWith("http"))
+            url = "http://" + url;
+
+        httpost.setHeader("Accept", "application/json");
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID, "")));
+        nvps.add(new BasicNameValuePair("url", url));
+        if((results.first))
+        {
+            nvps.add(new BasicNameValuePair("status", "blocked"));
+        }
+        else
+        {
+            nvps.add(new BasicNameValuePair("status", "ok"));
+        }
+        SimpleDateFormat sDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sDF.setTimeZone(TimeZone.getTimeZone("utc"));
+        nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
+        nvps.add(new BasicNameValuePair("config", "2014051801"));
+        try
+        {
+            nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY, ""), nvps)));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("signature",""));
+        }
 
         try
         {
-            HttpResponse response = httpclient.execute(httpget);
+            nvps.add(new BasicNameValuePair("ip_network",ispMeta.ipAddress));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("ip_network","0.0.0.0"));
+        }
+
+        try
+        {
+            nvps.add(new BasicNameValuePair("network_name", ispMeta.ispName));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("network_name", "ether"));
+        }
+
+        nvps.add(new BasicNameValuePair("http_status", "0"));
+
+        nvps.add(new BasicNameValuePair("confidence", Integer.toString(results.second)));
+
+        try
+        {
+            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+
+            HttpResponse response = httpclient.execute(httpost);
             String rawJSON = EntityUtils.toString(response.getEntity());
             response.getEntity().consumeContent();
-            Log.e("rawJSON",rawJSON);
+            Log.e("API Raw JSON",rawJSON);
             json = new JSONObject(rawJSON);
 
-            return new Pair(json.getString("YourFuckingLocation"),json.getString("YourFuckingISP"));
+            //TODO In future versions we'll check for success and store it for later if it failed
         }
         catch(Exception e)
         {
             e.printStackTrace();
-            return new Pair(null,null);
+        }
+    }
+
+    public void notifyBackEnd(CensorPayload censorPayload)
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+        ISPMeta ispMeta = getISPMeta();
+        HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
+
+        if(!censorPayload.URL.startsWith("http"))
+            censorPayload.URL = "http://" + censorPayload.URL;
+
+        httpost.setHeader("Accept", "application/json");
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID, "")));
+        nvps.add(new BasicNameValuePair("url", censorPayload.URL));
+        if((censorPayload.isCensored()))
+        {
+            nvps.add(new BasicNameValuePair("status", "blocked"));
+            Log.e("wasError","Blocked");
+        }
+        else
+        {
+            if(censorPayload.wasError())
+            {
+                nvps.add(new BasicNameValuePair("status", "error"));
+                Log.e("wasError","True");
+            }
+            else
+            {
+                nvps.add(new BasicNameValuePair("status", "ok"));
+                Log.e("wasError","False");
+            }
+        }
+
+        SimpleDateFormat sDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sDF.setTimeZone(TimeZone.getTimeZone("utc"));
+        nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
+        nvps.add(new BasicNameValuePair("config", "2014052101"));
+        try
+        {
+            nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY, ""), nvps)));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("signature",""));
+        }
+
+        try
+        {
+            nvps.add(new BasicNameValuePair("ip_network",ispMeta.ipAddress));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("ip_network","0.0.0.0"));
+        }
+
+        try
+        {
+            nvps.add(new BasicNameValuePair("network_name", ispMeta.ispName));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("network_name", "ether"));
+        }
+
+        nvps.add(new BasicNameValuePair("http_status", Integer.toString(censorPayload.getReturnCode())));
+
+        nvps.add(new BasicNameValuePair("confidence", Integer.toString(censorPayload.getConfidence())));
+
+        try
+        {
+            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+
+            HttpResponse response = httpclient.execute(httpost);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("API Raw JSON",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            //TODO In future versions we'll check for success and store it for later if it failed
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -405,7 +589,7 @@ public class API
 
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("gcm_id", settings.getString(API.PROPERTY_REG_ID,"")));
-        nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(SETTINGS_USER_PRIVATE_KEY,""),nvps)));
+        nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(SETTINGS_PROBE_PRIVATE_KEY,""),nvps)));
 
         nvps.add(new BasicNameValuePair("frequency", Integer.toString(frequency)));
         nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID,"")));

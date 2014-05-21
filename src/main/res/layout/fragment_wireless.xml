@@ -116,6 +116,7 @@
         android:layout_below="@+id/simLabel"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="40dp"
+        android:visibility="gone"
         android:checked="true" />
 
     <ImageView

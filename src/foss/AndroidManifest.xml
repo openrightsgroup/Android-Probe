@@ -16,27 +16,6 @@
         android:uiOptions="splitActionBarWhenNarrow"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name="uk.bowdlerize.MainActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="uk.bowdlerize.SetupActivity" android:label="@string/app_name" />
-
-        <!--<receiver
-            android:name=".gcm.CCBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="uk.bowdlerize" />
-            </intent-filter>
-        </receiver>-->
-        <service android:name=".service.CensorCensusService" />
     </application>
 
 </manifest>

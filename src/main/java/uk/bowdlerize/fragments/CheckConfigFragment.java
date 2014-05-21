@@ -102,6 +102,10 @@ public class CheckConfigFragment extends Fragment
                 editor.putInt(API.SETTINGS_FREQUENCY, value);
                 editor.commit();
 
+                Intent pollingIntent = new Intent(getActivity(), CensorCensusService.class);
+                pollingIntent.putExtra(API.EXTRA_POLL,true);
+                getActivity().startService(pollingIntent);
+
                 new AsyncTask<Void, Void, Boolean>()
                 {
                     @Override
@@ -130,71 +134,6 @@ public class CheckConfigFragment extends Fragment
                 }.execute(null, null, null);
             }
         });
-
-
-        /*((CheckBox) rootView.findViewById(R.id.ccEnabled)).setChecked(settings.getBoolean("ccEnabled", true));
-        ((CheckBox) rootView.findViewById(R.id.ccEnabled)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked)
-            {
-                progressBar.setVisibility(View.VISIBLE);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("ccEnabled",isChecked);
-                editor.commit();
-
-                if(!isChecked)
-                    ((NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE)).cancel(CensorCensusService.NOTIFICATION_ID);
-
-                new AsyncTask<Void, Void, Boolean>()
-                {
-                    @Override
-                    protected Boolean doInBackground(Void... params)
-                    {
-                        DefaultHttpClient httpclient = new DefaultHttpClient();
-                        JSONObject json;
-                        HttpPost httpost;
-                        if(isChecked)
-                        {
-                            httpost = new HttpPost("https://bowdlerize.co.uk/api/1/enablegcm.php");
-                        }
-                        else
-                        {
-                            httpost = new HttpPost("https://bowdlerize.co.uk/api/1/disablegcm.php");
-                        }
-
-                        httpost.setHeader("Accept", "application/json");
-
-                        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-                        nvps.add(new BasicNameValuePair("deviceid", Hashes.MD5(Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID))));
-
-                        try
-                        {
-                            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
-                            HttpResponse response = httpclient.execute(httpost);
-                            String rawJSON = EntityUtils.toString(response.getEntity());
-                            response.getEntity().consumeContent();
-                            Log.e("rawJSON", rawJSON);
-                            json = new JSONObject(rawJSON);
-                        }
-                        catch(Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                        return true;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Boolean success)
-                    {
-                        //TODO if it fails we should retry
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                }.execute(null, null, null);
-            }
-        });*/
-
 
         int GCMPreference = settings.getInt(API.SETTINGS_GCM_PREFERENCE,API.SETTINGS_GCM_FULL);
 
@@ -238,12 +177,12 @@ public class CheckConfigFragment extends Fragment
                 final API api = new API(getActivity());
                 final int progress = progressBar.getProgress();
 
-                Intent receiveURLIntent = new Intent(getActivity(), CensorCensusService.class);
-                receiveURLIntent.putExtra("url","http://google.com");
+                Intent pollingIntent = new Intent(getActivity(), CensorCensusService.class);
+                //receiveURLIntent.putExtra("url","http://google.com");
                 if(checkedId == R.id.gcmFull)
                 {
                     editor.putInt(API.SETTINGS_GCM_PREFERENCE, API.SETTINGS_GCM_FULL);
-                    receiveURLIntent.putExtra(API.EXTRA_POLL,false);
+                    pollingIntent.putExtra(API.EXTRA_POLL,false);
 
                     new Thread()
                     {
@@ -263,7 +202,7 @@ public class CheckConfigFragment extends Fragment
                 else if(checkedId == R.id.gcmPartial)
                 {
                     editor.putInt(API.SETTINGS_GCM_PREFERENCE, API.SETTINGS_GCM_PARTIAL);
-                    receiveURLIntent.putExtra(API.EXTRA_POLL,false);
+                    pollingIntent.putExtra(API.EXTRA_POLL,false);
 
                     new Thread()
                     {
@@ -283,7 +222,7 @@ public class CheckConfigFragment extends Fragment
                 else
                 {
                     editor.putInt(API.SETTINGS_GCM_PREFERENCE, API.SETTINGS_GCM_DISABLED);
-                    receiveURLIntent.putExtra(API.EXTRA_POLL,true);
+                    pollingIntent.putExtra(API.EXTRA_POLL,true);
 
                     new Thread()
                     {
@@ -301,7 +240,7 @@ public class CheckConfigFragment extends Fragment
                     }.start();
                 }
                 //Start the service with the new settings
-                getActivity().startService(receiveURLIntent);
+                getActivity().startService(pollingIntent);
                 editor.commit();
             }
         });

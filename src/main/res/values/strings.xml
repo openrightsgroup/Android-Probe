@@ -20,7 +20,7 @@
     <string name="privKeyDialogMessage">Add your user HMAC secret to the clipboard to mange other probes or just to put somewhere for safe keeping</string>
 
     <string name="warningTitle">WARNING: READ BEFORE USE</string>
-    <string name="warningMessage">IT IS STRONGLY RECOMMENDED YOU DO NOT USE THIS APP UNLESS YOU FULLY UNDERSTAND THE IMPLICATIONS\n\nIf you click "I agree" this app will possibly receive URLs that lead to censored or illegal content.\n\nThe app will only make a HTTP HEAD request so content (legal or otherwise) should not be downloaded (as per RFC2616) but there is still the possibility of repercussions.\n\nBy agreeing to use this app you indemnify the author of any liability.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</string>
+    <string name="warningMessage">IT IS STRONGLY RECOMMENDED YOU DO NOT USE THIS APP UNLESS YOU FULLY UNDERSTAND THE IMPLICATIONS\n\nIf you click "I agree" this app will possibly receive URLs that lead to censored or illegal content.\n\nThe app will only make a HTTP GET request so content (legal or otherwise) could be stored in memory so there is the possibility of repercussions.\n\nBy agreeing to use this app you indemnify the author of any liability.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</string>
     <string name="warningAgree">I Agree</string>
     <string name="warningExit">No, Exit!</string>
     <string name="warningAgreed">Thank you for helping to make the Internet more accountable!</string>
@@ -46,7 +46,7 @@
     <string name="emailHint">Email Address</string>
     <string name="loginUser">Login</string>
     <string name="registerUser">Register</string>
-    <string name="privKeyHint">-----BEGIN RSA PRIVATE KEY-----\nAdd your existing private key here if you have one\n\n-----END RSA PRIVATE KEY-----</string>
+    <string name="privKeyHint">Add your existing user HMAC secret here if you have one</string>
     <string name="createUserIntro">To help keep track of probe registrations please create an account.</string>
     <string name="createUserIntroComplete">Your account is configured and ready to register probes!</string>
     <string name="checkLogin">Check Status</string>
