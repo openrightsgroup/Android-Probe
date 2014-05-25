@@ -18,6 +18,10 @@
 */
 package uk.bowdlerize.support;
 
+import android.util.Log;
+
+import org.apache.http.Header;
+
 public class CensorPayload
 {
     public static int CONFIDENCE_BLOCKED_STRING = 100;
@@ -33,6 +37,8 @@ public class CensorPayload
     private String confidenceReason = "None";
     private int returnCode = 200;
     public String URL = "";
+    int bytes = 0;
+
 
     public CensorPayload(String url)
     {
@@ -70,6 +76,13 @@ public class CensorPayload
         isCensored = true;
         confidenceReason = exception.getMessage();
         confidence = exception.confidence;
+
+        /*Log.e("Size", exception.httpResponse.toString());
+
+        for(Header hdr : exception.httpResponse.getAllHeaders())
+        {
+            Log.e("intercepted header", hdr.getName().toString() + " / " + hdr.getValue().toString());
+        }*/
     }
 
     public void setCensored(Boolean censor_state)

@@ -48,6 +48,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.CheckConfigFragment;
+import uk.bowdlerize.fragments.ProgressFragment;
 import uk.bowdlerize.fragments.StatsFragment;
 import uk.bowdlerize.fragments.WirelessConfigFragment;
 import uk.bowdlerize.service.CensorCensusService;
@@ -420,7 +421,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
                 case 2:
                 {
-                    getFragment = new StatsFragment();
+                    getFragment = new ProgressFragment();
                 }
                 break;
             }

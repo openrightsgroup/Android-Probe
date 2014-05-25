@@ -36,8 +36,12 @@
         android:id="@+id/wifiNetwork"
         android:layout_alignRight="@+id/descText"
         android:layout_alignBaseline="@+id/wifiLabel"
-        android:paddingRight="12dp" />
+        android:paddingRight="12dp"
+        android:layout_toRightOf="@+id/wifiLabel"
+        android:gravity="right"
+        android:ellipsize="marquee" />
 
+    <!--
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
@@ -51,16 +55,7 @@
         android:gravity="right"
         android:layout_toRightOf="@+id/newNetworkIcon">
 
-        <EditText
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/WiFiISPET"
-
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="true"
-            android:enabled="false" />
-
-    </LinearLayout>
+    </LinearLayout>-->
 
     <TextView
         android:layout_width="wrap_content"
@@ -70,8 +65,8 @@
         android:fontFamily="sans-serif-light"
         android:id="@+id/mobileLabel"
         android:layout_alignLeft="@+id/wifiLabel"
-        android:paddingTop="20dp"
-        android:layout_below="@+id/WiFiMetaContainer" />
+        android:paddingTop="40dp"
+        android:layout_below="@+id/wifiLabel" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -82,7 +77,7 @@
         android:layout_below="@+id/mobileLabel"
         android:fontFamily="sans-serif-light"
         android:layout_alignLeft="@+id/mobileLabel"
-        android:paddingTop="20dp" />
+        android:paddingTop="40dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -119,24 +114,58 @@
         android:visibility="gone"
         android:checked="true" />
 
+
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/WiFiISPET"
+        android:hint="ISP Name"
+        android:enabled="false"
+        android:paddingTop="40dp"
+        android:layout_below="@+id/simNetwork"
+        android:layout_alignParentRight="true" />
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newNetworkIcon"
         android:src="@drawable/ic_alerts_and_states_warning"
-        android:layout_alignLeft="@+id/wifiLabel"
-        android:layout_below="@+id/wifiLabel" />
+        android:layout_below="@+id/WiFiISPET"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"/>
 
     <ProgressBar
         style="?android:attr/progressBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progressBar"
-        android:layout_alignTop="@+id/sendDataCB"
-        android:layout_toRightOf="@+id/sendDataCB"
-        android:layout_marginLeft="40dp"
-        android:layout_alignBottom="@+id/sendDataCB"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:layout_below="@+id/WiFiISPET"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" />
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Filter Level:"
+        android:id="@+id/censorLabel"
+        android:layout_below="@+id/WiFiISPET"
+        android:fontFamily="sans-serif-light"
+        android:layout_alignLeft="@+id/mobileLabel"
+        android:paddingTop="40dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Auto Detected"
+        android:id="@+id/censorLevel"
+        android:fontFamily="sans-serif-light"
+        android:layout_alignBottom="@+id/censorLabel"
+        android:layout_alignParentRight="true"
+        android:paddingRight="12dp" />
 </RelativeLayout>
     </ScrollView>

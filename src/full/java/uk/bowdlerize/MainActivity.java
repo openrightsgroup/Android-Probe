@@ -553,7 +553,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
                 case 2:
                 {
-                    getFragment = new StatsFragment();
+                    getFragment = new ProgressFragment();
                 }
                 break;
             }

@@ -68,6 +68,7 @@ import java.util.TimeZone;
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
+import uk.bowdlerize.fragments.ProgressFragment;
 import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.CensoredException;
 
@@ -90,6 +91,7 @@ public class CensorCensusService extends Service
     HttpGet httpGet;
     HttpResponse response = null;
     API api = null;
+    int bytes = 0;
 
     @Override
     public IBinder onBind(Intent intent)
@@ -142,6 +144,11 @@ public class CensorCensusService extends Service
 
     private void prepProbe(final Intent intent)
     {
+        Intent newIntent = new Intent();
+        newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+        newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.TALKING_TO_ORG);
+        sendBroadcast(newIntent);
+
         new Thread()
         {
             public void run()
@@ -165,7 +172,9 @@ public class CensorCensusService extends Service
                     url = null;
                     hash = ".....";
                     warnOnError();
+                    onProbeFinish();
                 }
+
             }
         }.start();
     }
@@ -175,7 +184,7 @@ public class CensorCensusService extends Service
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
                 .setBigContentTitle("Censor Census - Requesting URL")
                 .addLine("Requesting a URL for testing...")
-                .addLine("(Talking to blocked.org.uk )")
+                .addLine("( Polling blocked.org.uk )")
                 .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
                 .setSmallIcon(R.drawable.ic_stat_in_progress)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
@@ -184,26 +193,42 @@ public class CensorCensusService extends Service
                 .setAutoCancel(false);
         mBuilder.setProgress(2,1,true);
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        /*Intent newIntent = new Intent();
+        newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+        newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.TALKING_TO_ORG);
+        sendBroadcast(newIntent);*/
     }
 
     private void warnOnError()
     {
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                .setBigContentTitle("Censor Census - Error")
-                .addLine("There was an error getting the URL")
-                .addLine("--------------")
+                .setBigContentTitle("Censor Census - No URLs")
+                .addLine("There are currently no URLs queued to be checked.")
+                .addLine("Why not add one of your own?")
                 .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
-                .setSmallIcon(R.drawable.ic_stat_in_progress)
+                .setSmallIcon(R.drawable.ic_stat_waiting)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
-                .setTicker("Censor Census - Error")
+                .setTicker("Censor Census - No URLs")
                 .setAutoCancel(false);
+        mBuilder.setProgress(0,0,false);
 
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        /*Intent newIntent = new Intent();
+        newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+        newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.TALKING_TO_ORG);
+        sendBroadcast(newIntent);*/
     }
 
     private void performProbe(final Intent intent)
     {
+        Intent newIntent = new Intent();
+        newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+        newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.TALKING_TO_ISP);
+        sendBroadcast(newIntent);
+
         //If this is user submitted send it up for further research
         if(intent.getBooleanExtra("local",false))
         {
@@ -270,6 +295,11 @@ public class CensorCensusService extends Service
 
                             if(censorPayload.wasCensored())
                             {
+                                Intent newIntent = new Intent();
+                                newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+                                newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.BLOCKED);
+                                sendBroadcast(newIntent);
+
                                 mBuilder.setTicker("Found a possibly censored URL!");
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
                                         .setBigContentTitle("Censor Census - Waiting")
@@ -283,6 +313,11 @@ public class CensorCensusService extends Service
                             }
                             else
                             {
+                                Intent newIntent = new Intent();
+                                newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+                                newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.OK);
+                                sendBroadcast(newIntent);
+
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
                                         .setBigContentTitle("Censor Census - Waiting")
                                         .addLine("Last check: " + currentDateTimeString)
@@ -320,6 +355,7 @@ public class CensorCensusService extends Service
                         /*if(sendtoORG)
                             notifyOONIDirectly(url,wasCensored, intent.getStringExtra("isp"), intent.getStringExtra("sim"));
                         */
+
                         onProbeFinish();
                     }
                 }
@@ -550,50 +586,40 @@ public class CensorCensusService extends Service
             censorPayload.consumeCensoredException(CE);
             return censorPayload;
         }
-        catch (UnknownHostException uhe) {
+        catch (UnknownHostException uhe)
+        {
             uhe.printStackTrace();
-
-            /*censorPayload.setCensored(false);
-            censorPayload.setConfidence(50);*/
             censorPayload.consumeError(uhe.getMessage());
             return censorPayload;
         }
-        catch (ConnectTimeoutException CTE) {
+        catch (ConnectTimeoutException CTE)
+        {
             CTE.printStackTrace();
-
-            /*censorPayload.setCensored(true);
-            censorPayload.setConfidence(5);*/
             censorPayload.consumeError(CTE.getMessage());
             return censorPayload;
         }
         catch (NoHttpResponseException NHRE)
         {
             NHRE.printStackTrace();
-
-            /*censorPayload.setCensored(true);
-            censorPayload.setConfidence(5);*/
             censorPayload.consumeError(NHRE.getMessage());
             return censorPayload;
         }
         catch (IOException ioe)
         {
             ioe.printStackTrace();
-
-            /*censorPayload.setCensored(false);
-            censorPayload.setConfidence(0);*/
             censorPayload.consumeError(ioe.getMessage());
             return censorPayload;
         }
-        catch (IllegalStateException ise) {
+        catch (IllegalStateException ise)
+        {
             ise.printStackTrace();
-
             censorPayload.setCensored(false);
             censorPayload.setConfidence(0);
             return censorPayload;
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             e.printStackTrace();
-
             censorPayload.setCensored(false);
             censorPayload.setConfidence(0);
             return censorPayload;
@@ -604,7 +630,8 @@ public class CensorCensusService extends Service
         censorPayload.setReturnCode(statusCode);
 
         Log.e("checkURL code", Integer.toString(statusCode));
-        if (statusCode == 403 || statusCode == 404) {
+        if (statusCode == 403 || statusCode == 404)
+        {
             censorPayload.setCensored(true);
             censorPayload.setConfidence(25);
             return censorPayload;
@@ -616,8 +643,11 @@ public class CensorCensusService extends Service
         }
 
         String phrase = response.getStatusLine().getReasonPhrase();
+
         Log.e("checkURL phrase", phrase);
-        if (phrase.contains("orbidden")) {
+
+        if (phrase.contains("orbidden"))
+        {
             censorPayload.setCensored(true);
             censorPayload.setConfidence(50);
             return censorPayload;

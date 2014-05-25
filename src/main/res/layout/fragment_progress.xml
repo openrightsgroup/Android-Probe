@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/randomHex"
+        android:id="@+id/progressText"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:fontFamily="sans-serif-thin"
+        android:textSize="10sp"
+        android:textColor="#E4E4E4" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/userIconIV"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/ic_phone" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/orgServerIV"
+        android:src="@drawable/ic_launcher"
+        android:layout_marginLeft="64dp"
+        android:layout_alignTop="@+id/userIconIV"
+        android:layout_toRightOf="@+id/userIconIV"
+        android:layout_above="@+id/ispIV" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ispIV"
+        android:layout_below="@+id/userIconIV"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_neutral"
+        android:layout_marginTop="64dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/serverIV"
+        android:layout_below="@+id/ispIV"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="64dp"
+        android:src="@drawable/ic_browser_neutral" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bouncerUserISP"
+        android:focusableInTouchMode="false"
+        android:src="@drawable/ic_bouncer"
+        android:layout_alignTop="@+id/bouncerUserORG"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bouncerUserORG"
+        android:src="@drawable/ic_bouncer"
+        android:layout_alignTop="@+id/userIconIV"
+        android:layout_alignLeft="@+id/bouncerUserISP"
+        android:layout_alignStart="@+id/bouncerUserISP"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="You"
+        android:id="@+id/textView"
+        android:layout_alignTop="@+id/userIconIV"
+        android:layout_toLeftOf="@+id/userIconIV"
+        android:layout_marginRight="12dp"
+        android:fontFamily="sans-serif-condensed"
+        android:layout_alignBottom="@+id/userIconIV"
+        android:gravity="center_vertical" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Your ISP"
+        android:id="@+id/textView2"
+        android:layout_alignBottom="@+id/ispIV"
+        android:layout_toLeftOf="@+id/ispIV"
+        android:layout_alignTop="@+id/ispIV"
+        android:gravity="center_vertical"
+        android:layout_marginRight="12dp"
+        android:fontFamily="sans-serif-condensed"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Target Website"
+        android:id="@+id/textView3"
+        android:layout_alignBottom="@+id/serverIV"
+        android:layout_toLeftOf="@+id/serverIV"
+        android:layout_alignTop="@+id/serverIV"
+        android:gravity="center_vertical"
+        android:layout_marginRight="12dp"
+        android:fontFamily="sans-serif-condensed"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Open Rights Group"
+        android:id="@+id/blockedLabel"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="top"
+        android:layout_below="@+id/orgServerIV"
+        android:layout_alignLeft="@+id/orgServerIV"
+        android:layout_alignStart="@+id/orgServerIV" />
+
+</RelativeLayout>

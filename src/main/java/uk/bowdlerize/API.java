@@ -492,6 +492,9 @@ public class API
 
     public void notifyBackEnd(CensorPayload censorPayload)
     {
+        if(null == censorPayload || null == censorPayload.URL || censorPayload.URL.isEmpty() ||  censorPayload.URL.equals(""))
+            return;
+
         DefaultHttpClient httpclient = new DefaultHttpClient();
         JSONObject json;
         ISPMeta ispMeta = getISPMeta();

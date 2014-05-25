@@ -1,13 +1,13 @@
 # The Censor Census Android Client #
-part of the [Bowdlerize.co.uk](https://bowdlerize.co.uk) Censor Census Project, the [Open Rights Group Censorship Monitoring Project](https://wiki.openrightsgroup.org/wiki/ORG_Censorship_Monitoring_Project) feeding into the [Open Observatory of Network Interference](https://ooni.torproject.org/)
+Originally started life as the [Bowdlerize.co.uk](https://bowdlerize.co.uk) Censor Census Project but is now part of the [Open Rights Group Censorship Monitoring Project](https://wiki.openrightsgroup.org/wiki/ORG_Censorship_Monitoring_Project) feeding into the [Open Observatory of Network Interference](https://ooni.torproject.org/)
 
 ## How To Help Bring Transparency To UK Internet Filtering ##
 
-* Install the app from [Google Play](https://play.google.com/store/apps/details?id=uk.bowdlerize)
+* Install the app from [Google Play](https://play.google.com/store/apps/details?id=uk.org.blocked.app)
 * URLs are sent to your phone/tablet from the Censorship Monitoring Project servers *(URLs are found from social media or user submissions)*
-* Your device issues a [HTTP HEAD request](http://developer.android.com/reference/org/apache/http/client/methods/HttpHead.html) and then reports back if it could reach the URL or not
+* Your device issues a [HTTP GET request](https://developer.android.com/reference/org/apache/http/client/methods/HttpGet.html) and then reports back if it could reach the URL or not
 * The Censorship Monitoring Project servers retain this information to help map the spread of online censorship
-* Data is also passed onto the [Open Observatory of Network Interference](https://ooni.torproject.org/)
+* Censorship data may also passed onto the [Open Observatory of Network Interference](https://ooni.torproject.org/)
 
 ## Why is this needed? ##
 
