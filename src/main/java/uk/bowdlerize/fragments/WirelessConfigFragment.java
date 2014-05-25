@@ -216,8 +216,6 @@ public class WirelessConfigFragment extends Fragment
             }
 
             Log.e("SIM",simNetName);
-
-
         }
         catch (NullPointerException npe)
         {

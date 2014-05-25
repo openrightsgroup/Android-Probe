@@ -68,6 +68,7 @@ import java.util.TimeZone;
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
+import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.ProgressFragment;
 import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.CensoredException;
@@ -292,6 +293,9 @@ public class CensorCensusService extends Service
 
                             //Update our local stats
                             setCounts(censorPayload.wasCensored());
+
+                            censorPayload.MD5 = hash;
+
 
                             if(censorPayload.wasCensored())
                             {

@@ -8,6 +8,8 @@
     <string name="title_section2">Request Config</string>
     <string name="title_section3">Observatory of Net Interference Signup</string>
     <string name="title_section4">Visualisation</string>
+    <string name="title_section5">Results</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_add">Test Link</string>
     <string name="action_cancel">Cancel</string>
@@ -230,5 +232,6 @@ de 12 bf 2f 74 7b 42 95 62 37 3c e5 2d ed 54 e9
 a0 bc 0a ac 42 34 a2 e5 ac 62 5e 2e 3d 9c ac 8a</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

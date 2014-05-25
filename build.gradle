@@ -80,6 +80,7 @@ android {
 
 dependencies
 {
+    compile 'com.android.support:support-v4:19.+'
     fullCompile 'com.google.android.gms:play-services:3.1.36','com.android.support:support-v13:+'
 
     fossCompile 'com.android.support:support-v13:+'

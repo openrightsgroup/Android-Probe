@@ -66,6 +66,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
 
+import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.ISPMeta;
 
@@ -499,6 +500,8 @@ public class API
         JSONObject json;
         ISPMeta ispMeta = getISPMeta();
         HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
+        LocalCache lc;
+        int resultForDB = -1;
 
         if(!censorPayload.URL.startsWith("http"))
             censorPayload.URL = "http://" + censorPayload.URL;
@@ -512,6 +515,7 @@ public class API
         {
             nvps.add(new BasicNameValuePair("status", "blocked"));
             Log.e("wasError","Blocked");
+            resultForDB = LocalCache.RESULT_BLOCKED;
         }
         else
         {
@@ -519,11 +523,13 @@ public class API
             {
                 nvps.add(new BasicNameValuePair("status", "error"));
                 Log.e("wasError","True");
+                resultForDB = LocalCache.RESULT_ERROR;
             }
             else
             {
                 nvps.add(new BasicNameValuePair("status", "ok"));
                 Log.e("wasError","False");
+                resultForDB = LocalCache.RESULT_OK;
             }
         }
 
@@ -577,6 +583,21 @@ public class API
         catch(Exception e)
         {
             e.printStackTrace();
+        }
+
+        try
+        {
+            lc = new LocalCache(mContext);
+            lc.open();
+            lc.addResult(censorPayload.URL,censorPayload.MD5,ispMeta.ispName,resultForDB);
+
+            if(null != lc)
+                lc.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            lc = null;
         }
     }
 

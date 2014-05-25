@@ -60,7 +60,8 @@
         android:focusableInTouchMode="false"
         android:src="@drawable/ic_bouncer"
         android:layout_alignTop="@+id/bouncerUserORG"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -70,7 +71,8 @@
         android:layout_alignTop="@+id/userIconIV"
         android:layout_alignLeft="@+id/bouncerUserISP"
         android:layout_alignStart="@+id/bouncerUserISP"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:visibility="invisible" />
 
     <TextView
         android:layout_width="wrap_content"

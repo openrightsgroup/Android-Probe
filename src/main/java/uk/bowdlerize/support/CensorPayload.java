@@ -37,6 +37,7 @@ public class CensorPayload
     private String confidenceReason = "None";
     private int returnCode = 200;
     public String URL = "";
+    public String MD5 = "";
     int bytes = 0;
 
 
@@ -58,6 +59,7 @@ public class CensorPayload
         confidenceReason = _reason;
         returnCode = response;
     }
+
 
     public void consumeError(String reason)
     {

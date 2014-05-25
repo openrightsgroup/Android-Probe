@@ -49,6 +49,7 @@ import android.widget.Toast;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.CheckConfigFragment;
 import uk.bowdlerize.fragments.ProgressFragment;
+import uk.bowdlerize.fragments.ResultsGrid;
 import uk.bowdlerize.fragments.WirelessConfigFragment;
 import uk.bowdlerize.service.CensorCensusService;
 import static uk.bowdlerize.support.Hashes.MD5;
@@ -423,6 +424,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     getFragment = new ProgressFragment();
                 }
                 break;
+
+                case 3:
+                {
+                    getFragment = new ResultsGrid();
+                }
+                break;
             }
 
             return getFragment;
@@ -431,7 +438,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 4;
         }
 
         @Override
@@ -444,6 +451,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     return getString(R.string.title_section2).toUpperCase(l);
                 case 2:
                     return getString(R.string.title_section4).toUpperCase(l);
+                case 3:
+                    return getString(R.string.title_section5).toUpperCase(l);
             }
             return null;
         }

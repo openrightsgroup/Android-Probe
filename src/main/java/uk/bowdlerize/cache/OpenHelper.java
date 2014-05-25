@@ -22,10 +22,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class OpenHelper extends SQLiteOpenHelper
 {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "bowdlerizeCache";
 
 
@@ -39,7 +40,7 @@ public class OpenHelper extends SQLiteOpenHelper
     {
         try
         {
-            db.execSQL("CREATE TABLE \"wifiNetworks\"  (\"id\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , \"SSID\" TEXT, \"ISP\" TEXT )");
+            db.execSQL("CREATE  TABLE \"probeResults\" (\"id\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL  UNIQUE , \"isp\" INTEGER, \"testTime\" DATETIME DEFAULT CURRENT_TIMESTAMP, \"md5\" TEXT, \"url\" TEXT, \"result\" INTEGER DEFAULT 0)");
         }
         catch(SQLiteException s)
         {
@@ -49,15 +50,26 @@ public class OpenHelper extends SQLiteOpenHelper
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            db.execSQL("CREATE  TABLE \"isp\" (\"ispID\" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , \"ispName\" TEXT UNIQUE check(typeof(\"ispName\") = 'text') )");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        //Log.v("onUpgrade", "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
+        Log.v("onUpgrade", "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
         try
         {
-            //db.execSQL("DROP TABLE IF EXISTS wifiNetworks");
+            db.execSQL("DROP TABLE IF EXISTS wifiNetworks");
+            db.execSQL("DROP TABLE IF EXISTS isp");
+            db.execSQL("DROP TABLE IF EXISTS probeResults");
         }
         catch(Exception e)
         {

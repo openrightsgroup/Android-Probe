@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="4dp"
+    android:foregroundGravity="center">
+
+<RelativeLayout
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:background="#FFFFFF"
+    android:padding="8dp"
+    android:layout_centerInParent="true"
+    android:id="@+id/relativeLayout">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ooniImage"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_ooni_large" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/urlTV"
+        android:fontFamily="sans-serif-light"
+        android:layout_below="@+id/ooniImage"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/urlTV"
+        android:showDividers="middle"
+        android:divider="?android:dividerVertical"
+        android:layout_marginTop="4dp"
+        android:dividerPadding="8dp"
+        android:gravity="fill_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/ispTV"
+            android:fontFamily="sans-serif-thin"
+            android:paddingRight="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/dateTV"
+            android:fontFamily="sans-serif-thin"
+            android:paddingLeft="4dp" />
+        </LinearLayout>
+
+
+</RelativeLayout>
+
+</RelativeLayout>
