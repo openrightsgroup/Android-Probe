@@ -19,8 +19,14 @@
 package uk.bowdlerize.fragments;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -37,6 +43,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,9 +56,91 @@ import uk.bowdlerize.support.ISPMeta;
 public class WirelessConfigFragment extends Fragment
 {
     SharedPreferences settings;
-    EditText ISPName;
+    TextView ISPName;
     View saveData;
     View newNetworkIcon;
+    BroadcastReceiver receiver;
+    IntentFilter filter;
+    TextView mobileNet;
+    TextView simNet;
+    TextView wifiNet;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String action = intent.getAction();
+
+                if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION))
+                {
+                    return;
+                }
+
+                boolean noConnectivity = intent.getBooleanExtra( ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                NetworkInfo aNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+
+                boolean isDead = false;
+
+                if (!noConnectivity)
+                {
+                    if ((aNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) || (aNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI))
+                    {
+                        // Handle connected case
+                        Log.e("Connectivity","We're connected!");
+                        isDead = false;
+                    }
+                }
+                else
+                {
+                    if ((aNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE) || (aNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI))
+                    {
+                        // Handle disconnected case
+                        Log.e("Connectivity","Everything is dead Jim!");
+                        isDead = true;
+                    }
+                }
+
+                refreshNetMeta(isDead);
+            }
+        };
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onPause()
+    {
+        Log.w("onPause", "Pausing, unregistering...");
+        super.onPause();
+        try
+        {
+            getActivity().unregisterReceiver(receiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            if (e.getMessage().contains("Receiver not registered"))
+            {
+                // Ignore this exception. This is exactly what is desired
+                Log.w("onPause", "Tried to unregister the receiver when it's not registered");
+            }
+            else
+            {
+                // unexpected, re-throw
+                throw e;
+            }
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -62,26 +151,73 @@ public class WirelessConfigFragment extends Fragment
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+
+        //Checkbox for sending this along
+        /*((CheckBox) rootView.findViewById(R.id.sendDataCB)).setChecked(settings.getBoolean("sendISPMeta", true));
+        ((CheckBox) rootView.findViewById(R.id.sendDataCB)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                saveData.setVisibility(View.VISIBLE);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("sendISPMeta",isChecked);
+                editor.commit();
+                saveData.setVisibility(View.INVISIBLE);
+            }
+        });*/
+        mobileNet = ((TextView) rootView.findViewById(R.id.mobileNetwork));
+        simNet = ((TextView) rootView.findViewById(R.id.simNetwork));
+        wifiNet = ((TextView) rootView.findViewById(R.id.wifiNetwork));
+        ISPName = ((TextView) rootView.findViewById(R.id.WiFiISPET));
+
+        newNetworkIcon = rootView.findViewById(R.id.newNetworkIcon);
+        saveData = rootView.findViewById(R.id.progressBar);
+
+        return rootView;
+    }
+
+    private void refreshNetMeta(boolean allDead)
+    {
+        if(allDead)
+        {
+            mobileNet.setText("Offline");
+            simNet.setText("Offline");
+            wifiNet.setText("Offline");
+            ISPName.setText("Offline");
+
+            return;
+        }
+
+        ISPName.setText("");
+
         //Mobile stuff
         try
         {
             TelephonyManager telephonyManager =((TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE));
 
-            String mobileNet = telephonyManager.getNetworkOperatorName();
+            String mobileNetName = telephonyManager.getNetworkOperatorName();
 
-            if(mobileNet.equals(""))
-                mobileNet = "Unknown";
+            if(mobileNetName.equals(""))
+                mobileNetName = "Unknown";
 
-            ((TextView) rootView.findViewById(R.id.mobileNetwork)).setText(mobileNet);
+            mobileNet.setText(mobileNetName);
 
-            String simNet = telephonyManager.getSimOperatorName();
+            String simNetName = telephonyManager.getSimOperatorName();
 
-            if(simNet.equals(""))
-                simNet = "Unknown";
+            if(simNetName.equals("") || simNetName.isEmpty())
+            {
+                simNet.setTypeface(Typeface.create("sans-serif-light", Typeface.ITALIC));
+                simNet.setText("Unknown");
+            }
+            else
+            {
+                simNet.setText(simNetName);
+                simNet.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+            }
 
-            Log.e("SIM",simNet);
+            Log.e("SIM",simNetName);
 
-            ((TextView) rootView.findViewById(R.id.simNetwork)).setText(simNet);
+
         }
         catch (NullPointerException npe)
         {
@@ -95,20 +231,113 @@ public class WirelessConfigFragment extends Fragment
         {
             WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-            wifiName = wifiInfo.getSSID();
 
             Log.e("WiFi", wifiName + " / " + wifiInfo.getBSSID() + " / " + wifiInfo.getNetworkId());
 
-            ((TextView) rootView.findViewById(R.id.wifiNetwork)).setText(wifiName.replaceAll("\"",""));
+            if(wifiInfo.getNetworkId() == -1)
+            {
+                wifiNet.setText("Disconnected");
+                wifiNet.setTypeface(Typeface.create("sans-serif-light", Typeface.ITALIC));
+            }
+            else
+            {
+                wifiName = wifiInfo.getSSID();
+                wifiNet.setText(wifiName.replaceAll("\"", ""));
+                wifiNet.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
 
+        //Lets Poll for who the new ISP is
+        saveData.setVisibility(View.VISIBLE);
+        /*newNetworkIcon.setVisibility(View.VISIBLE);
+        Animation shakeIt = AnimationUtils.loadAnimation(getActivity(), R.anim.wobble);
+        newNetworkIcon.startAnimation(shakeIt);
 
-        //If wifi is new name
-        LocalCache lc = null;
+        newNetworkIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), getString(R.string.wirelessNew), Toast.LENGTH_SHORT).show();
+                Animation shakeIt = AnimationUtils.loadAnimation(getActivity(), R.anim.wobble);
+                v.startAnimation(shakeIt);
+            }
+        });*/
+
+        saveData.setVisibility(View.VISIBLE);
+
+        new AsyncTask<Void, Void, Pair<String,String>>()
+        {
+            @Override
+            protected Pair<String,String> doInBackground(Void... params)
+            {
+                API api = new API(getActivity());
+                ISPMeta ispMeta = api.getISPMeta();
+                return new Pair<String,String>(ispMeta.ipAddress,ispMeta.ispName);
+            }
+
+            @Override
+            protected void onPostExecute(Pair<String,String> ispMeta)
+            {
+                LocalCache lc = null;
+                try
+                {
+                    //ISP is no longer tied to the SSID
+                    /*WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+                    WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+
+                    lc = new LocalCache(getActivity());
+                    lc.open();
+                    lc.addSSID(wifiInfo.getSSID().replaceAll("\"",""),ispMeta.second);*/
+
+                    ISPName.setText(ispMeta.second);
+                    /*Animation animationFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fadeout);
+                    newNetworkIcon.startAnimation(animationFadeOut);
+                    animationFadeOut.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation)
+                        {
+                            newNetworkIcon.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+
+                    saveData.setVisibility(View.INVISIBLE);*/
+
+                    Animation animationFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fadeout);
+                    saveData.startAnimation(animationFadeOut);
+                    animationFadeOut.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) { }
+
+                        @Override
+                        public void onAnimationEnd(Animation animation){ saveData.setVisibility(View.INVISIBLE); }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }.execute();
+
+
+        //If wifi is a new name
+        /*LocalCache lc = null;
         Pair<Boolean,String> seenBefore = null;
         try
         {
@@ -123,10 +352,6 @@ public class WirelessConfigFragment extends Fragment
 
         if(null != lc)
             lc.close();
-
-        newNetworkIcon = rootView.findViewById(R.id.newNetworkIcon);
-        saveData = rootView.findViewById(R.id.progressBar);
-        ISPName = (EditText) rootView.findViewById(R.id.WiFiISPET);
 
         if(seenBefore.first)
         {
@@ -204,74 +429,6 @@ public class WirelessConfigFragment extends Fragment
                     }
                 }
             }.execute();
-        }
-
-        /*ISPName = ((EditText) rootView.findViewById(R.id.WiFiISPET));
-        rootView.findViewById(R.id.SSIDNameSaveButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v)
-            {
-                LocalCache lc = null;
-
-                ISPName.setEnabled(false);
-
-                try
-                {
-                    WifiManager wifiMgr = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
-                    WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-
-                    lc = new LocalCache(getActivity());
-                    lc.open();
-                    lc.addSSID(wifiInfo.getSSID().replaceAll("\"",""),ISPName.getText().toString());
-
-                    Animation animationFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fadeout);
-                    v.startAnimation(animationFadeOut);
-                    newNetworkIcon.startAnimation(animationFadeOut);
-                    animationFadeOut.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation)
-                        {
-                            v.setVisibility(View.INVISIBLE);
-                            newNetworkIcon.setVisibility(View.INVISIBLE);
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    v.setEnabled(false);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if(null != lc)
-                    lc.close();
-            }
-        });*/
-
-        //Checkbox for sending this along
-        ((CheckBox) rootView.findViewById(R.id.sendDataCB)).setChecked(settings.getBoolean("sendISPMeta", true));
-        ((CheckBox) rootView.findViewById(R.id.sendDataCB)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                saveData.setVisibility(View.VISIBLE);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("sendISPMeta",isChecked);
-                editor.commit();
-                saveData.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        return rootView;
+        }*/
     }
 }

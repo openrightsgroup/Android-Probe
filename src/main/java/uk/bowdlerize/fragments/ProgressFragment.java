@@ -52,6 +52,7 @@ public class ProgressFragment extends Fragment
     static public int TALKING_TO_ISP = 1;
     static public int BLOCKED = 2;
     static public int OK = 3;
+    static public int NO_URLS = 4;
     IntentFilter filter;
 
     public ProgressFragment()
@@ -90,6 +91,10 @@ public class ProgressFragment extends Fragment
                     AnimateUserToISP(false);
                     ispIV.setImageDrawable(getResources().getDrawable(R.drawable.ic_ok));
                     serverIV.setImageDrawable(getResources().getDrawable(R.drawable.ic_browser_ok));
+                }
+                else if(intent.getIntExtra(ORG_BROADCAST,0) == NO_URLS)
+                {
+                    Reset();
                 }
             }
         };
@@ -189,6 +194,16 @@ public class ProgressFragment extends Fragment
             bouncerUserISP.setVisibility(View.GONE);
             bouncerUserISP.setAnimation(null);
         }
+    }
+
+    private void Reset()
+    {
+        bouncerUserORG.setVisibility(View.GONE);
+        bouncerUserORG.setAnimation(null);
+        bouncerUserISP.setVisibility(View.GONE);
+        bouncerUserISP.setAnimation(null);
+        ispIV.setImageDrawable(getResources().getDrawable(R.drawable.ic_neutral));
+        serverIV.setImageDrawable(getResources().getDrawable(R.drawable.ic_browser_neutral));
     }
 
 }

@@ -216,10 +216,10 @@ public class CensorCensusService extends Service
 
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-        /*Intent newIntent = new Intent();
+        Intent newIntent = new Intent();
         newIntent.setAction(ProgressFragment.ORG_BROADCAST);
-        newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.TALKING_TO_ORG);
-        sendBroadcast(newIntent);*/
+        newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.NO_URLS);
+        sendBroadcast(newIntent);
     }
 
     private void performProbe(final Intent intent)
@@ -373,13 +373,20 @@ public class CensorCensusService extends Service
         if(getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getInt(API.SETTINGS_GCM_PREFERENCE,API.SETTINGS_GCM_FULL) == API.SETTINGS_GCM_DISABLED)
         {
             am.cancel(pi); // cancel any existing alarms
-            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 60000);
+            //TODO Setback to 60000
+            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 60000);//60000 or 5000
             Log.e("onProbeFinish",Long.toString(repeat));
+            Log.e("onProbeFinish","          -         ");
+            Log.e("onProbeFinish","          -         ");
+            Log.e("onProbeFinish","          -         ");
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime() + repeat, pi);
         }
         else
         {
             Log.e("onProbeFinish","Cancel everything!");
+            Log.e("onProbeFinish","          -         ");
+            Log.e("onProbeFinish","          -         ");
+            Log.e("onProbeFinish","          -         ");
             am.cancel(pi); // cancel any existing alarms
             stopSelf();
         }

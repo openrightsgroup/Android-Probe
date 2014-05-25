@@ -102,7 +102,7 @@
         android:paddingRight="12dp" />
 
 
-
+    <!--
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -112,38 +112,53 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="40dp"
         android:visibility="gone"
-        android:checked="true" />
+        android:checked="true" />-->
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Actual ISP:"
+        android:id="@+id/ultimateISPLabel"
+        android:paddingTop="40dp"
+        android:textStyle="bold"
+        android:layout_below="@+id/simNetwork"
+        android:fontFamily="sans-serif"/>
 
-    <EditText
-        android:layout_width="fill_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/WiFiISPET"
-        android:hint="ISP Name"
-        android:enabled="false"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:paddingTop="40dp"
-        android:layout_below="@+id/simNetwork"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:layout_alignBaseline="@+id/ultimateISPLabel"
+        android:textStyle="bold"
+        android:layout_alignLeft="@+id/newNetworkIcon"
+        android:layout_alignStart="@+id/newNetworkIcon"
+        android:layout_marginLeft="20dp"
+        android:paddingRight="12dp" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newNetworkIcon"
         android:src="@drawable/ic_alerts_and_states_warning"
-        android:layout_below="@+id/WiFiISPET"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignBottom="@+id/ultimateISPLabel"
+        android:layout_toRightOf="@+id/ultimateISPLabel"
+        android:visibility="invisible" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progressBar"
-        android:visibility="invisible"
-        android:layout_below="@+id/WiFiISPET"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true" />
+        android:visibility="visible"
+        android:layout_alignBottom="@+id/ultimateISPLabel"
+        android:layout_alignRight="@+id/WiFiISPET"
+        android:layout_alignEnd="@+id/WiFiISPET" />
 
 
     <TextView
@@ -152,7 +167,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Filter Level:"
         android:id="@+id/censorLabel"
-        android:layout_below="@+id/WiFiISPET"
+        android:layout_below="@+id/ultimateISPLabel"
         android:fontFamily="sans-serif-light"
         android:layout_alignLeft="@+id/mobileLabel"
         android:paddingTop="40dp" />
