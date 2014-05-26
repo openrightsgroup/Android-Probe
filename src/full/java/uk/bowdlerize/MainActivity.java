@@ -55,6 +55,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.CheckConfigFragment;
+import uk.bowdlerize.fragments.ResultsGrid;
 import uk.bowdlerize.fragments.StatsFragment;
 import uk.bowdlerize.fragments.WirelessConfigFragment;
 import uk.bowdlerize.service.CensorCensusService;
