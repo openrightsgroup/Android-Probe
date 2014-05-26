@@ -24,7 +24,11 @@ import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
+
+import org.apache.http.Header;
+import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -33,8 +37,11 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.InvalidKeyException;
@@ -59,6 +66,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.support.CensorPayload;
+import uk.bowdlerize.support.CensoredException;
 import uk.bowdlerize.support.ISPMeta;
 
 public class API
@@ -76,6 +84,10 @@ public class API
     public static final String SETTINGS_UUID = "probe_uuid";
     public static final String SETTINGS_FREQUENCY = "frequency";
     public static final String SETTINGS_FREQUENCY_SEEK = "frequency_seek";
+
+    public static final int FILTERING_NONE = 0;
+    public static final int FILTERING_MEDIUM = 1;
+    public static final int FILTERING_STRICT = 2;
 
     public static final String EXTRA_POLL = "poll_for_url";
     public static final String EXTRA_GCM_TICKLE = "gcm_tickle";
@@ -405,83 +417,6 @@ public class API
         }
     }
 
-    @Deprecated
-    public void notifyBackEnd(String url, String hmac, Pair<Boolean,Integer> results,String ISP, String SIM)
-    {
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        JSONObject json;
-        ISPMeta ispMeta = getISPMeta();
-        HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
-
-        if(!url.startsWith("http"))
-            url = "http://" + url;
-
-        httpost.setHeader("Accept", "application/json");
-
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID, "")));
-        nvps.add(new BasicNameValuePair("url", url));
-        if((results.first))
-        {
-            nvps.add(new BasicNameValuePair("status", "blocked"));
-        }
-        else
-        {
-            nvps.add(new BasicNameValuePair("status", "ok"));
-        }
-        SimpleDateFormat sDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        sDF.setTimeZone(TimeZone.getTimeZone("utc"));
-        nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
-        nvps.add(new BasicNameValuePair("config", "2014051801"));
-        try
-        {
-            nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY, ""), nvps)));
-        }
-        catch (Exception e)
-        {
-            nvps.add(new BasicNameValuePair("signature",""));
-        }
-
-        try
-        {
-            nvps.add(new BasicNameValuePair("ip_network",ispMeta.ipAddress));
-        }
-        catch (Exception e)
-        {
-            nvps.add(new BasicNameValuePair("ip_network","0.0.0.0"));
-        }
-
-        try
-        {
-            nvps.add(new BasicNameValuePair("network_name", ispMeta.ispName));
-        }
-        catch (Exception e)
-        {
-            nvps.add(new BasicNameValuePair("network_name", "ether"));
-        }
-
-        nvps.add(new BasicNameValuePair("http_status", "0"));
-
-        nvps.add(new BasicNameValuePair("confidence", Integer.toString(results.second)));
-
-        try
-        {
-            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
-            HttpResponse response = httpclient.execute(httpost);
-            String rawJSON = EntityUtils.toString(response.getEntity());
-            response.getEntity().consumeContent();
-            Log.e("API Raw JSON",rawJSON);
-            json = new JSONObject(rawJSON);
-
-            //TODO In future versions we'll check for success and store it for later if it failed
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     public void notifyBackEnd(CensorPayload censorPayload)
     {
         if(null == censorPayload || null == censorPayload.URL || censorPayload.URL.isEmpty() ||  censorPayload.URL.equals(""))
@@ -677,6 +612,189 @@ public class API
         return new String(hexChars);
     }
 
+    public int ascertainFilteringLevel()
+    {
+        String checkURL = "http://www.reddit.com";
+        int returnInt = FILTERING_STRICT;
+
+        DefaultHttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(checkURL);
+        httpGet.setHeader("User-Agent", "OONI Android Probe");
+
+        try
+        {
+            client.addResponseInterceptor(new HttpResponseInterceptor()
+            {
+                @Override
+                public void process(HttpResponse httpResponse, HttpContext httpContext) throws HttpException, IOException
+                {
+                    if (httpResponse.getStatusLine().getStatusCode() == 302 || httpResponse.getStatusLine().getStatusCode() == 301)
+                    {
+                        for (Header hdr : httpResponse.getAllHeaders())
+                        {
+                            if (hdr.getName().toString().equals("Location"))
+                            {
+                                checkHeader(hdr);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        catch (Exception e) { e.printStackTrace(); return -1; }
+
+        try { client.execute(httpGet); }
+        catch (CensoredException ce) { return returnInt; }
+        catch (Exception e) { }
+
+        returnInt = FILTERING_MEDIUM;
+        checkURL = "http://www.reddit.com/r/nsfw/";
+        httpGet = new HttpGet(checkURL);
+
+        try { client.execute(httpGet); }
+        catch (CensoredException ce) { return returnInt; }
+        catch (Exception e) { }
+
+        return FILTERING_NONE;
+    }
+
+    public int checkHeader(Header header) throws CensoredException
+    {
+        if (header.getName().toString().equals("Location"))
+        {
+            if (header.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html") ||
+                    header.getValue().contains("http://ee-outage.s3.amazonaws.com")) {
+                Log.e("Blocked", "Blocked by EE");
+                throw new CensoredException("Blocked by EE", "EE", 100);
+            } else if (header.getValue().contains("http://www.t-mobile.co.uk/service/wnw-mig/entry/") ||
+                    header.getValue().contains("http://tmobile.ee.co.uk/common/system_error_pages/outage_wnw.html")) {
+                Log.e("Blocked", "Blocked by TMobile");
+                throw new CensoredException("Blocked by TMobile", "TMobile", 100);
+            } else if (header.getValue().contains("http://online.vodafone.co.uk/dispatch/Portal/ContentControlServlet?type=restricted")) {
+                Log.e("Blocked", "Blocked by Vodafone");
+                throw new CensoredException("Blocked by Vodafone", "Vodafone", 100);
+            } else if (header.getValue().contains("http://blockpage.bt.com/pcstaticpage/blocked.html")) {
+                Log.e("Blocked", "Blocked by BT");
+                throw new CensoredException("Blocked by BT", "BT", 100);
+            } else if (header.getValue().contains("http://www.talktalk.co.uk/notice/parental-controls?accessurl")) {
+                Log.e("Blocked", "Blocked by TalkTalk");
+                throw new CensoredException("Blocked by TalkTalk", "TalkTalk", 100);
+            } else if (header.getValue().contains("http://www.plus.net/support/security/abuse/blocked.shtml")) {
+                Log.e("Blocked", "Blocked by PlusNet");
+                throw new CensoredException("Blocked by PlusNet", "PlusNet", 100);
+            } else if (header.getValue().contains("http://mobile.three.co.uk/pc/Live/pcreator/live/100004/pin/blocked?")) {
+                Log.e("Blocked", "Blocked by Three");
+                throw new CensoredException("Blocked by Three", "Three", 100);
+            } else if (header.getValue().contains("http://m.virginmedia.com/MiscPages/AdultWarning.aspx")) {
+                Log.e("Blocked", "Blocked by VirginMobile");
+                throw new CensoredException("Blocked by VirginMobile", "VirginMobile", 100);
+            } else if (header.getValue().contains("http://assets.o2.co.uk/18plusaccess/")) {
+                Log.e("Blocked", "Blocked by O2");
+                throw new CensoredException("Blocked by O2", "O2", 100);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Deprecated
+    public void notifyBackEnd(String url, String hmac, Pair<Boolean,Integer> results,String ISP, String SIM)
+    {
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        JSONObject json;
+        ISPMeta ispMeta = getISPMeta();
+        HttpPost httpost = new HttpPost("https://api.blocked.org.uk/1.2/response/httpt");
+
+        if(!url.startsWith("http"))
+            url = "http://" + url;
+
+        httpost.setHeader("Accept", "application/json");
+
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID, "")));
+        nvps.add(new BasicNameValuePair("url", url));
+        if((results.first))
+        {
+            nvps.add(new BasicNameValuePair("status", "blocked"));
+        }
+        else
+        {
+            nvps.add(new BasicNameValuePair("status", "ok"));
+        }
+        SimpleDateFormat sDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sDF.setTimeZone(TimeZone.getTimeZone("utc"));
+        nvps.add(new BasicNameValuePair("date", sDF.format(new Date())));
+        nvps.add(new BasicNameValuePair("config", "2014051801"));
+        try
+        {
+            nvps.add(new BasicNameValuePair("signature", SignHeaders(settings.getString(API.SETTINGS_PROBE_PRIVATE_KEY, ""), nvps)));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("signature",""));
+        }
+
+        try
+        {
+            nvps.add(new BasicNameValuePair("ip_network",ispMeta.ipAddress));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("ip_network","0.0.0.0"));
+        }
+
+        try
+        {
+            nvps.add(new BasicNameValuePair("network_name", ispMeta.ispName));
+        }
+        catch (Exception e)
+        {
+            nvps.add(new BasicNameValuePair("network_name", "ether"));
+        }
+
+        nvps.add(new BasicNameValuePair("http_status", "0"));
+
+        nvps.add(new BasicNameValuePair("confidence", Integer.toString(results.second)));
+
+        try
+        {
+            httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+
+            HttpResponse response = httpclient.execute(httpost);
+            String rawJSON = EntityUtils.toString(response.getEntity());
+            response.getEntity().consumeContent();
+            Log.e("API Raw JSON",rawJSON);
+            json = new JSONObject(rawJSON);
+
+            //TODO In future versions we'll check for success and store it for later if it failed
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     @Deprecated
     private String SignHeaders(String dataToSign) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, NoSuchProviderException, SignatureException

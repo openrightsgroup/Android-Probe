@@ -19,9 +19,14 @@
 package uk.bowdlerize.fragments;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +48,9 @@ public class ResultsGrid extends Fragment
     GridView gridView;
     Handler handler;
     ArrayList<ResultMeta> resultMetas;
+    BroadcastReceiver receiver;
+    IntentFilter filter;
+    ResultsGridAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -70,12 +78,29 @@ public class ResultsGrid extends Fragment
                             Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
                         }
                     });
-
-                    gridView.setAdapter(new ResultsGridAdapter(getActivity(),resultMetas));
+                    adapter = new ResultsGridAdapter(getActivity(),resultMetas);
+                    gridView.setAdapter(adapter);
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                }
+            }
+        };
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                if (intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.BLOCKED ||
+                        intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.OK)
+                {
+                    Log.e("Grid receiver", "Yo we see it!");
+                    /*resultMetas.add();
+                    gridView.setAdapter(new ResultsGridAdapter(getActivity(),resultMetas));
+                    adapter.notifyDataSetChanged();*/
+                    if(null != adapter)
+                        adapter.addResult(new ResultMeta(intent.getStringExtra("url"),intent.getStringExtra("hash"),intent.getStringExtra("date"),intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0)));
                 }
             }
         };
@@ -106,5 +131,33 @@ public class ResultsGrid extends Fragment
                 handler.sendEmptyMessage(1);
             }
         }).start();
+
+        filter = new IntentFilter();
+        filter.addAction(ProgressFragment.ORG_BROADCAST);
+        getActivity().registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onPause()
+    {
+        Log.w("onPause", "Pausing, unregistering...");
+        super.onPause();
+        try
+        {
+            getActivity().unregisterReceiver(receiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            if (e.getMessage().contains("Receiver not registered"))
+            {
+                // Ignore this exception. This is exactly what is desired
+                Log.w("onPause", "Tried to unregister the receiver when it's not registered");
+            }
+            else
+            {
+                // unexpected, re-throw
+                throw e;
+            }
+        }
     }
 }

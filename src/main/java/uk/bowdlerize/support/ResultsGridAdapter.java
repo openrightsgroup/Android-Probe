@@ -59,6 +59,12 @@ public class ResultsGridAdapter extends BaseAdapter
         return position;
     }
 
+    public void addResult(ResultMeta rm)
+    {
+       resultMetas.add(0, rm);
+       notifyDataSetChanged();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
@@ -71,7 +77,7 @@ public class ResultsGridAdapter extends BaseAdapter
         }
 
 
-        ((TextView) convertView.findViewById(R.id.urlTV)).setText(rm.URL.replace("http://",""));
+        ((TextView) convertView.findViewById(R.id.urlTV)).setText(rm.URL.replace("http://","").replace("https://",""));
         ((TextView) convertView.findViewById(R.id.ispTV)).setText(rm.ISP);
         ((TextView) convertView.findViewById(R.id.dateTV)).setText(rm.Date);
 

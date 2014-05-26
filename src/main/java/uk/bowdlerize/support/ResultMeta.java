@@ -27,7 +27,7 @@ import uk.bowdlerize.cache.LocalCache;
  */
 public class ResultMeta
 {
-    public String ISP = "Test";
+    public String ISP = "     ";
     public String MD5  = "Test";
     public String URL  = "Test";
     public int result  = LocalCache.RESULT_BLOCKED;
@@ -42,5 +42,13 @@ public class ResultMeta
         MD5 = cursor.getString(3);
         URL = cursor.getString(4);
         result = cursor.getInt(5);
+    }
+
+    public ResultMeta(String url, String hash, String date, int rslt)
+    {
+        URL = url;
+        MD5 = hash;
+        Date = date;
+        result = rslt;
     }
 }

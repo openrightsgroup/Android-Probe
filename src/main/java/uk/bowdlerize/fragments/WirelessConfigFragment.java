@@ -40,13 +40,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
@@ -64,6 +58,7 @@ public class WirelessConfigFragment extends Fragment
     TextView mobileNet;
     TextView simNet;
     TextView wifiNet;
+    TextView censorLevel;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -169,6 +164,7 @@ public class WirelessConfigFragment extends Fragment
         simNet = ((TextView) rootView.findViewById(R.id.simNetwork));
         wifiNet = ((TextView) rootView.findViewById(R.id.wifiNetwork));
         ISPName = ((TextView) rootView.findViewById(R.id.WiFiISPET));
+        censorLevel = ((TextView) rootView.findViewById(R.id.censorLevel));
 
         newNetworkIcon = rootView.findViewById(R.id.newNetworkIcon);
         saveData = rootView.findViewById(R.id.progressBar);
@@ -333,6 +329,38 @@ public class WirelessConfigFragment extends Fragment
             }
         }.execute();
 
+
+        new AsyncTask<Void, Void, Integer>()
+        {
+            @Override
+            protected Integer doInBackground(Void... params)
+            {
+                API api = new API(getActivity());
+                return api.ascertainFilteringLevel();
+            }
+
+            @Override
+            protected void onPostExecute(Integer filteringLevel)
+            {
+
+                if(filteringLevel < 0)
+                {
+                    censorLevel.setText("Indeterminate");
+                }
+                else if(filteringLevel == API.FILTERING_STRICT)
+                {
+                    censorLevel.setText("Strict");
+                }
+                else if(filteringLevel == API.FILTERING_MEDIUM)
+                {
+                    censorLevel.setText("Medium");
+                }
+                else
+                {
+                    censorLevel.setText("None");
+                }
+            }
+        }.execute();
 
         //If wifi is a new name
         /*LocalCache lc = null;

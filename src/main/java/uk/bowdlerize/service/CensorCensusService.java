@@ -288,13 +288,15 @@ public class CensorCensusService extends Service
 
                             censorPayload.MD5 = hash;
 
+                            Intent ORGCensorIntent = new Intent();
+                            ORGCensorIntent.setAction(ProgressFragment.ORG_BROADCAST);
+                            ORGCensorIntent.putExtra("url",url);
+                            ORGCensorIntent.putExtra("hash",hash);
+                            ORGCensorIntent.putExtra("date",currentDateTimeString);
 
                             if(censorPayload.wasCensored())
                             {
-                                Intent newIntent = new Intent();
-                                newIntent.setAction(ProgressFragment.ORG_BROADCAST);
-                                newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.BLOCKED);
-                                sendBroadcast(newIntent);
+                                ORGCensorIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.BLOCKED);
 
                                 mBuilder.setTicker("Found a possibly blocked URL!");
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
@@ -309,10 +311,8 @@ public class CensorCensusService extends Service
                             }
                             else
                             {
-                                Intent newIntent = new Intent();
-                                newIntent.setAction(ProgressFragment.ORG_BROADCAST);
-                                newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.OK);
-                                sendBroadcast(newIntent);
+
+                                ORGCensorIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.OK);
 
                                 mBuilder.setTicker("Last URL wasn't blocked");
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
@@ -322,6 +322,8 @@ public class CensorCensusService extends Service
                                         .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
                                 );
                             }
+
+                            sendBroadcast(ORGCensorIntent);
                         }
                         catch (Exception e)
                         {
@@ -371,7 +373,7 @@ public class CensorCensusService extends Service
         {
             am.cancel(pi); // cancel any existing alarms
             //TODO Setback to 60000
-            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 5000);//60000 or 5000
+            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 60000);//60000 or 5000
             Log.e("onProbeFinish",Long.toString(repeat));
             Log.e("onProbeFinish","          -         ");
             Log.e("onProbeFinish","          -         ");
@@ -523,7 +525,8 @@ public class CensorCensusService extends Service
                         {
                             if (hdr.getName().toString().equals("Location"))
                             {
-                                if (hdr.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html"))
+                                /*if (hdr.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html") ||
+                                    hdr.getValue().contains("http://ee-outage.s3.amazonaws.com"))
                                 {
                                     Log.e("Blocked", "Blocked by EE");
                                     throw new CensoredException("Blocked by EE", "EE", 100);
@@ -568,7 +571,8 @@ public class CensorCensusService extends Service
                                 {
                                     Log.e("Blocked", "Blocked by O2");
                                     throw new CensoredException("Blocked by O2", "O2", 100);
-                                }
+                                }*/
+                                api.checkHeader(hdr);
                             }
                         }
                     }
