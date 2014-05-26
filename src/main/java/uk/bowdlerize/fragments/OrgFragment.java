@@ -30,7 +30,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import uk.bowdlerize.API;
@@ -97,7 +96,7 @@ public class OrgFragment extends Fragment
 
         progressBar = rootView.findViewById(R.id.progressBar);
 
-        ((Button) rootView.findViewById(R.id.GenProbeButton)).setOnClickListener(new View.OnClickListener() {
+        (rootView.findViewById(R.id.GenProbeButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
@@ -158,7 +157,7 @@ public class OrgFragment extends Fragment
 
                 if(null == probePrivKey || probePrivKey.equals(""))
                 {
-                    Toast.makeText(getActivity(),"There was a problem getting the private key for this probe",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),getString(R.string.errProbeHMACMsg),Toast.LENGTH_LONG).show();
                 }
                 else
                 {
@@ -171,7 +170,7 @@ public class OrgFragment extends Fragment
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString(API.SETTINGS_PROBE_PRIVATE_KEY,probePrivKey);
                     editor.commit();
-                    Toast.makeText(getActivity(),"Probe registration complete!",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),getString(R.string.probeRegstrCompMsg),Toast.LENGTH_LONG).show();
 
                     Intent in = new Intent();
                     getActivity().setResult(Activity.RESULT_OK,in);

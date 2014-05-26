@@ -20,11 +20,9 @@ package uk.bowdlerize;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
-
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -40,7 +38,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -174,7 +171,7 @@ public class API
             String rawJSON = EntityUtils.toString(response.getEntity());
             response.getEntity().consumeContent();
             Log.e("rawJSON",rawJSON);
-            String sb = rawJSON;
+            /*String sb = rawJSON;
             if (sb.length() > 4000) {
                 Log.v("rawJSON", "sb.length = " + sb.length());
                 int chunkCount = sb.length() / 4000;     // integer division
@@ -187,7 +184,7 @@ public class API
                         Log.v("rawJSON", "chunk " + i + " of " + chunkCount + ":" + sb.substring(4000 * i, max));
                     }
                 }
-            }
+            }*/
 
             json = new JSONObject(rawJSON);
 
@@ -212,8 +209,8 @@ public class API
         DefaultHttpClient httpclient = new DefaultHttpClient();
         JSONObject json;
 
-        TelephonyManager telephonyManager =((TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE));
-        String mobileNet = telephonyManager.getNetworkOperatorName();
+        //TelephonyManager telephonyManager =((TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE));
+        //String mobileNet = telephonyManager.getNetworkOperatorName();
 
         String uuid = settings.getString(SETTINGS_UUID,"");
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -516,14 +513,11 @@ public class API
             lc = new LocalCache(mContext);
             lc.open();
             lc.addResult(censorPayload.URL,censorPayload.MD5,ispMeta.ispName,resultForDB);
-
-            if(null != lc)
-                lc.close();
+            lc.close();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            lc = null;
         }
     }
 
@@ -590,9 +584,9 @@ public class API
         {
             NameValuePair nameValuePair = iterator.next();
 
-            Log.e("NameValuePair", nameValuePair.getName().toString() + " : " + nameValuePair.getValue().toString());
+            Log.e("NameValuePair", nameValuePair.getName() + " : " + nameValuePair.getValue());
 
-            SignData += nameValuePair.getValue().toString();
+            SignData += nameValuePair.getValue();
 
             if(iterator.hasNext())
                 SignData += ":";
@@ -632,7 +626,7 @@ public class API
                     {
                         for (Header hdr : httpResponse.getAllHeaders())
                         {
-                            if (hdr.getName().toString().equals("Location"))
+                            if (hdr.getName().equals("Location"))
                             {
                                 checkHeader(hdr);
                             }
@@ -645,7 +639,7 @@ public class API
 
         try { client.execute(httpGet); }
         catch (CensoredException ce) { return returnInt; }
-        catch (Exception e) { }
+        catch (Exception e) { e.printStackTrace(); }
 
         returnInt = FILTERING_MEDIUM;
         checkURL = "http://www.reddit.com/r/nsfw/";
@@ -653,14 +647,14 @@ public class API
 
         try { client.execute(httpGet); }
         catch (CensoredException ce) { return returnInt; }
-        catch (Exception e) { }
+        catch (Exception e) { e.printStackTrace(); }
 
         return FILTERING_NONE;
     }
 
     public int checkHeader(Header header) throws CensoredException
     {
-        if (header.getName().toString().equals("Location"))
+        if (header.getName().equals("Location"))
         {
             if (header.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html") ||
                     header.getValue().contains("http://ee-outage.s3.amazonaws.com")) {

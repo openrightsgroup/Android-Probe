@@ -182,11 +182,11 @@ public class CreateUserFragment extends Fragment
                 progressBar.setVisibility(View.GONE);
                 if(null == privKey)
                 {
-                    Toast.makeText(getActivity(),"An error occured registering.\nTry again later",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),getString(R.string.errRegisterMsg),Toast.LENGTH_LONG).show();
                 }
                 else if(privKey.equals(""))
                 {
-                    Toast.makeText(getActivity(),"Private Key was invalid",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),getString(R.string.hmacSecretInvalidMsg),Toast.LENGTH_LONG).show();
                 }
                 else
                 {
@@ -245,7 +245,7 @@ public class CreateUserFragment extends Fragment
 
                 if(null == status)
                 {
-                    Toast.makeText(getActivity(),"An error occurred checking your account.\nTry again later",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),getString(R.string.createErrorMsg),Toast.LENGTH_LONG).show();
                 }
                 else if(status.equals("ok"))
                 {
@@ -255,7 +255,7 @@ public class CreateUserFragment extends Fragment
                 }
                 else
                 {
-                    Toast.makeText(getActivity(),"Your account is currently " + status,Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),getString(R.string.accntStatusMsg) + status,Toast.LENGTH_LONG).show();
                 }
             }
         }.execute(null, null, null);

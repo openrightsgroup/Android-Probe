@@ -76,7 +76,7 @@ public class WirelessConfigFragment extends Fragment
                 }
 
                 boolean noConnectivity = intent.getBooleanExtra( ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-                NetworkInfo aNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                NetworkInfo aNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
                 boolean isDead = false;
 
@@ -176,10 +176,10 @@ public class WirelessConfigFragment extends Fragment
     {
         if(allDead)
         {
-            mobileNet.setText("Offline");
-            simNet.setText("Offline");
-            wifiNet.setText("Offline");
-            ISPName.setText("Offline");
+            mobileNet.setText(getString(R.string.offlineLabel));
+            simNet.setText(R.string.offlineLabel);
+            wifiNet.setText(R.string.offlineLabel);
+            ISPName.setText(R.string.offlineLabel);
 
             return;
         }
@@ -194,7 +194,7 @@ public class WirelessConfigFragment extends Fragment
             String mobileNetName = telephonyManager.getNetworkOperatorName();
 
             if(mobileNetName.equals(""))
-                mobileNetName = "Unknown";
+                mobileNetName = getString(R.string.unknownLabel);
 
             mobileNet.setText(mobileNetName);
 
@@ -203,7 +203,7 @@ public class WirelessConfigFragment extends Fragment
             if(simNetName.equals("") || simNetName.isEmpty())
             {
                 simNet.setTypeface(Typeface.create("sans-serif-light", Typeface.ITALIC));
-                simNet.setText("Unknown");
+                simNet.setText(getString(R.string.unknownLabel));
             }
             else
             {
@@ -230,7 +230,7 @@ public class WirelessConfigFragment extends Fragment
 
             if(wifiInfo.getNetworkId() == -1)
             {
-                wifiNet.setText("Disconnected");
+                wifiNet.setText(getString(R.string.disconLabel));
                 wifiNet.setTypeface(Typeface.create("sans-serif-light", Typeface.ITALIC));
             }
             else
@@ -345,19 +345,19 @@ public class WirelessConfigFragment extends Fragment
 
                 if(filteringLevel < 0)
                 {
-                    censorLevel.setText("Indeterminate");
+                    censorLevel.setText(getString(R.string.filterIndeterLabel));
                 }
                 else if(filteringLevel == API.FILTERING_STRICT)
                 {
-                    censorLevel.setText("Strict");
+                    censorLevel.setText(getString(R.string.filterStrictLabel));
                 }
                 else if(filteringLevel == API.FILTERING_MEDIUM)
                 {
-                    censorLevel.setText("Medium");
+                    censorLevel.setText(getString(R.string.filterMedLabel));
                 }
                 else
                 {
-                    censorLevel.setText("None");
+                    censorLevel.setText(getString(R.string.filterNoneLabel));
                 }
             }
         }.execute();

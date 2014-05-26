@@ -57,7 +57,7 @@ public class CheckConfigFragment extends Fragment
 
         seekValue = (TextView) rootView.findViewById(R.id.delayValueLabel);
 
-        seekValue.setText("Wait a minimum of " + strTimes[settings.getInt(API.SETTINGS_FREQUENCY_SEEK,0)]  + " between requests" );
+        seekValue.setText(getString(R.string.waitPrepend) + strTimes[settings.getInt(API.SETTINGS_FREQUENCY_SEEK,0)]  + getString(R.string.betweenAppend));
 
         ((SeekBar) rootView.findViewById(R.id.seekBar)).setProgress(settings.getInt(API.SETTINGS_FREQUENCY_SEEK, 0));
 
@@ -65,7 +65,7 @@ public class CheckConfigFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
-                seekValue.setText("Wait a minimum of " + strTimes[progress] + " between requests");
+                seekValue.setText(getString(R.string.waitPrepend) + strTimes[progress] + getString(R.string.betweenAppend));
             }
 
             @Override
@@ -233,54 +233,4 @@ public class CheckConfigFragment extends Fragment
         return rootView;
 
     }
-
-    /*private void updateGCM(final int type)
-    {
-        progressBar.setVisibility(View.VISIBLE);
-
-        new AsyncTask<Void, Void, Boolean>()
-        {
-            @Override
-            protected Boolean doInBackground(Void... params)
-            {
-                DefaultHttpClient httpclient = new DefaultHttpClient();
-                JSONObject json;
-                HttpPost httpost;
-
-                httpost = new HttpPost("https://bowdlerize.co.uk/api/1.1/update/gcm");
-
-                httpost.setHeader("Accept", "application/json");
-
-                List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-                nvps.add(new BasicNameValuePair("probe_uuid", settings.getString(API.SETTINGS_UUID,"")));
-                nvps.add(new BasicNameValuePair("frequency", Integer.toString(progressBar.getProgress())));
-                nvps.add(new BasicNameValuePair("gcm_id", settings.getString(API.PROPERTY_REG_ID,"")));
-                nvps.add(new BasicNameValuePair("gcm_type", Integer.toString(type)));
-
-                try
-                {
-                    httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
-                    HttpResponse response = httpclient.execute(httpost);
-                    String rawJSON = EntityUtils.toString(response.getEntity());
-                    response.getEntity().consumeContent();
-                    Log.e("rawJSON", rawJSON);
-                    json = new JSONObject(rawJSON);
-                }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success)
-            {
-                //TODO if it fails we should retry
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-        }.execute(null, null, null);
-    }*/
 }

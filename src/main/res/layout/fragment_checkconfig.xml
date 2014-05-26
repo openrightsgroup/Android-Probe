@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="1 min"
+        android:text="@string/defaultIntervalLabel"
         android:id="@+id/delayValueLabel"
         android:layout_below="@+id/seekBar"
         android:layout_alignRight="@+id/seekBar" />

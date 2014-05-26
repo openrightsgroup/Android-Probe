@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+
+    <!--======================================================================================
+    These strings can be dynamically replaced at run time for different languages.
+
+    If you have the time please help the Open Rights Group by translating them to make the app
+    more accessible to people of other languages
+
+                             ______ Only change this bit ________
+                           /                                     \
+    <string name="xxxxxx"> This is the part that needs translating</string>
+                    ^
+                    Don't change that part! :)
+
+    PULL REQUEST:
+    1. See: https://developer.android.com/training/basics/supporting-devices/languages.html
+    2. Create values-$LANG under res/
+    3. Copy your strings.xml file to res/values-$LANG
+    4. Send pull request
+
+    EMAIL:
+    1. Please email the xml file (and what language it is) to Gareth@NetworksAremadeOfString.co.uk
+    2. Optional encrypt with GPG key 0xAD4371CADE731050 [ DE731050 ]
+
+    Thank you!
+    =======================================================================================-->
+
     <string name="app_name">Censor Census</string>
     <string name="actionBarTitle">Censorship Monitoring Project</string>
     <string name="actionBarSubtitle">Making censorship accountable</string>
@@ -25,14 +51,67 @@
     <string name="warningAgree">I Agree</string>
     <string name="warningExit">No, Exit!</string>
     <string name="warningAgreed">Thank you for helping to make the Internet more accountable!</string>
+    <string name="addHint">http://theurltotest.com</string>
+    <string name="passwordHint">Password</string>
+
+    <!-- Notifications -->
+    <string name="notifChecked">Checked / </string>
+    <string name="notifPossBlock"> Possibly blocked</string>
+    <string name="notifURLRecv">URL Received</string>
+    <string name="notifNewURL">Received a new URL!</string>
+    <string name="notifSanityCheck">Performing sanity checks...</string>
+    <string name="notifStartAt">Started at</string>
+    <string name="notifCheckURL">Checking URL</string>
+    <string name="notifFoundBlock">Found a possibly blocked URL!</string>
+    <string name="notifLastURLBlocked">Last URL was possibly blocked!</string>
+    <string name="notifWaiting">Waiting</string>
+    <string name="notifLastChk">Last check</string>
+    <string name="notifLastChkNotBlock">Last URL wasn\'t blocked!</string>
+    <string name="notifError">Error</string>
+    <string name="notifNoURLToCheck">There are currently no URLs queued to be checked.</string>
+    <string name="notifAddURL">Why not add one of your own?</string>
+    <string name="notifRequesting">Requesting a URL for testing...</string>
+    <string name="notifPolling">Polling</string>
+    <string name="notifRequstURL">Requesting URL</string>
+    <string name="notifException">An exception was encountered during the last check</string>
+
+
+    <!-- Activity Setup -->
+    <string name="waitUserMsg">Waiting on user details</string>
+    <string name="waitAcctActiveMesg">Waiting on account activation</string>
+    <string name="waitAcctRegProbeMsg">Account ready to register a probe</string>
+    <string name="waitProbePrepMsg">Probe prepared</string>
+    <string name="probeRegCompMsg">Probe registration complete!</string>
+
+    <!-- Fragment Create User -->
+    <string name="createErrorMsg">An error occurred checking your account.
+Try again later</string>
+    <string name="accntStatusMsg">Your account is currently </string>
+    <string name="hmacSecretInvalidMsg">HMAC secret was invalid</string>
+    <string name="errRegisterMsg">An error occured registering.
+Try again later</string>
 
     <!-- Fragment ORG -->
     <string name="orgIntro">To participate in the Open Rights Group Censorship Monitoring Project ( http://bit.ly/18B4e8Y ) tap \"Generate Probe HMAC Secret\" which\'ll register this probe.</string>
     <string name="orgUnavailable">THIS FEATURE IS CURRENTLY UNAVAILABLE</string>
+    <string name="errProbeHMACMsg">There was a problem getting the private key for this probe</string>
+    <string name="probeRegstrCompMsg">Probe registration complete!</string>
 
     <!-- Fragment - Wireless -->
     <string name="wirelessMessage">The app automatically gathers data about your ISP to give a clear picture of which ISP is blocking what.</string>
     <string name="wirelessNew">This WiFi network hasn\'t been seen before, checking what it is?</string>
+    <string name="wifiLabel">WiFi Network:</string>
+    <string name="mobileLabel">Mobile Network:</string>
+    <string name="simLabel">SIM Network:</string>
+    <string name="actualISPLabel">Actual ISP:</string>
+    <string name="filterLabel">Estimated Filter Level:</string>
+    <string name="offlineLabel">Offline</string>
+    <string name="unknownLabel">Unknown</string>
+    <string name="disconLabel">Disconnected</string>
+    <string name="filterIndeterLabel">Indeterminate</string>
+    <string name="filterStrictLabel">Strict</string>
+    <string name="filterMedLabel">Medium</string>
+    <string name="filterNoneLabel">None</string>
 
     <!-- Fragment - Check Config -->
     <string name="checkFrequencyLabel">Check Frequency</string>
@@ -40,6 +119,9 @@
     <string name="radioGCMFull">Receive URL checks through Google Cloud Messaging</string>
     <string name="radioGCMPartial">Receive poll prompts via Google Cloud Messaging but poll for URL details</string>
     <string name="radioPoll">Do not use Google Cloud Messaging at all, poll for new URLs only</string>
+    <string name="defaultIntervalLabel">1 min</string>
+    <string name="waitPrepend">Wait a minimum of </string>
+    <string name="betweenAppend"> between requests</string>
 
     <!-- Fragments - Setup -->
     <string name="title_user_setup">User Setup</string>
@@ -51,6 +133,16 @@
     <string name="createUserIntro">To help keep track of probe registrations please create an account.</string>
     <string name="createUserIntroComplete">Your account is configured and ready to register probes!</string>
     <string name="checkLogin">Check Status</string>
+
+    <!-- Fragment Stats -->
+    <string name="checkedLabel">URLs Checked:</string>
+    <string name="censoredLabel">Possibly Censored:</string>
+
+    <!-- Fragment visualisation -->
+    <string name="youLabel">You</string>
+    <string name="yourISPLabel">Your ISP</string>
+    <string name="targetWebsite">Target Website</string>
+
 
     <!-- Widgets -->
     <string name="widgetHelp">Tap to test a new URL</string>

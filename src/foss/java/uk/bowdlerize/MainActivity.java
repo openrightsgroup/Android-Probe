@@ -227,6 +227,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 // Get the layout inflater
                 LayoutInflater inflater = getLayoutInflater();
+
                 View dialogView = inflater.inflate(R.layout.dialog_add_url, null);
 
                 final EditText urlET = (EditText) dialogView.findViewById(R.id.urlET);

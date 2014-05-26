@@ -34,6 +34,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+
 import uk.bowdlerize.R;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.support.ResultMeta;
@@ -92,15 +94,18 @@ public class ResultsGrid extends Fragment
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                if (intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.BLOCKED ||
-                        intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.OK)
+                if (null != intent &&
+                    intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.BLOCKED ||
+                    intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.OK)
                 {
-                    Log.e("Grid receiver", "Yo we see it!");
-                    /*resultMetas.add();
-                    gridView.setAdapter(new ResultsGridAdapter(getActivity(),resultMetas));
-                    adapter.notifyDataSetChanged();*/
-                    if(null != adapter)
-                        adapter.addResult(new ResultMeta(intent.getStringExtra("url"),intent.getStringExtra("hash"),intent.getStringExtra("date"),intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0)));
+                    try {
+                        if (null != adapter)
+                            adapter.addResult(new ResultMeta(intent.getStringExtra("url"), intent.getStringExtra("hash"), intent.getStringExtra("date"), intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0)));
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         };
@@ -111,7 +116,7 @@ public class ResultsGrid extends Fragment
     {
         super.onResume();
 
-        ((Thread) new Thread(){
+        new Thread(){
             public void run()
             {
                 try
@@ -130,7 +135,7 @@ public class ResultsGrid extends Fragment
 
                 handler.sendEmptyMessage(1);
             }
-        }).start();
+        }.start();
 
         filter = new IntentFilter();
         filter.addAction(ProgressFragment.ORG_BROADCAST);

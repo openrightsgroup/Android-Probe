@@ -171,21 +171,21 @@ public class SetupActivity extends Activity implements ActionBar.TabListener, Cr
             case CreateUserFragment.USER_NOTHING:
             {
                 ((ProgressBar) findViewById(R.id.statusProgressBar)).setProgress(0);
-                ((TextView) findViewById(R.id.progressStatusTV)).setText("Waiting on user details");
+                ((TextView) findViewById(R.id.progressStatusTV)).setText(getString(R.string.waitUserMsg));
             }
             break;
 
             case CreateUserFragment.USER_PENDING:
             {
                 ((ProgressBar) findViewById(R.id.statusProgressBar)).setProgress(1);
-                ((TextView) findViewById(R.id.progressStatusTV)).setText("Waiting on account activation");
+                ((TextView) findViewById(R.id.progressStatusTV)).setText(getString(R.string.waitAcctActiveMesg));
             }
             break;
 
             case CreateUserFragment.USER_COMPLETE:
             {
                 ((ProgressBar) findViewById(R.id.statusProgressBar)).setProgress(2);
-                ((TextView) findViewById(R.id.progressStatusTV)).setText("Account ready to register a probe");
+                ((TextView) findViewById(R.id.progressStatusTV)).setText(getString(R.string.waitAcctRegProbeMsg));
                 mViewPager.setCurrentItem(1);
             }
             break;
@@ -193,7 +193,7 @@ public class SetupActivity extends Activity implements ActionBar.TabListener, Cr
             case OrgFragment.PROBE_PENDING:
             {
                 ((ProgressBar) findViewById(R.id.statusProgressBar)).setProgress(3);
-                ((TextView) findViewById(R.id.progressStatusTV)).setText("Probe prepared");
+                ((TextView) findViewById(R.id.progressStatusTV)).setText(getString(R.string.waitProbePrepMsg));
                 mViewPager.setCurrentItem(1);
             }
             break;
@@ -201,7 +201,7 @@ public class SetupActivity extends Activity implements ActionBar.TabListener, Cr
             case OrgFragment.PROBE_COMPLETE:
             {
                 ((ProgressBar) findViewById(R.id.statusProgressBar)).setProgress(4);
-                ((TextView) findViewById(R.id.progressStatusTV)).setText("Probe registration complete!");
+                ((TextView) findViewById(R.id.progressStatusTV)).setText(getString(R.string.probeRegCompMsg));
 
                 Intent in = new Intent();
                 setResult(RESULT_OK,in);

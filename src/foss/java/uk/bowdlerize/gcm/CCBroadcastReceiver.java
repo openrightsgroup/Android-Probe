@@ -18,20 +18,9 @@
 */
 package uk.bowdlerize.gcm;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Bundle;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.util.Pair;
-import uk.bowdlerize.API;
-import uk.bowdlerize.MainActivity;
-import uk.bowdlerize.cache.LocalCache;
-import uk.bowdlerize.service.CensorCensusService;
 
 public class CCBroadcastReceiver extends BroadcastReceiver
 {

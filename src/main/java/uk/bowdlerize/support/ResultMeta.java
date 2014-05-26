@@ -19,12 +19,9 @@
 package uk.bowdlerize.support;
 
 import android.database.Cursor;
-
 import uk.bowdlerize.cache.LocalCache;
 
-/**
- * Created by Gareth on 25/05/2014.
- */
+
 public class ResultMeta
 {
     public String ISP = "     ";

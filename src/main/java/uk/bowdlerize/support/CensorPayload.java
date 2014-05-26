@@ -18,10 +18,6 @@
 */
 package uk.bowdlerize.support;
 
-import android.util.Log;
-
-import org.apache.http.Header;
-
 public class CensorPayload
 {
     public static int CONFIDENCE_BLOCKED_STRING = 100;

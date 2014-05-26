@@ -175,14 +175,14 @@ public class CensorCensusService extends Service
     private void warnOnPrep()
     {
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                .setBigContentTitle("Censor Census - Requesting URL")
-                .addLine("Requesting a URL for testing...")
-                .addLine("( Polling blocked.org.uk )")
-                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked"))
+                .setBigContentTitle(getString(R.string.app_name) + " - " + getString(R.string.notifRequstURL))
+                .addLine(getString(R.string.notifRequesting))
+                .addLine("( "+ getString(R.string.notifPolling) +" blocked.org.uk )")
+                .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock)))
                 .setSmallIcon(R.drawable.ic_stat_in_progress)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
-                .setTicker("Censor Census - Requesting URL")
+                .setTicker(getString(R.string.app_name) + " - " + getString(R.string.notifRequstURL))
                 .setAutoCancel(false);
         mBuilder.setProgress(2,1,true);
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -196,14 +196,14 @@ public class CensorCensusService extends Service
     private void warnOnError()
     {
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                .setBigContentTitle("Censor Census - No URLs")
-                .addLine("There are currently no URLs queued to be checked.")
-                .addLine("Why not add one of your own?")
-                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked"))
+                .setBigContentTitle(getString(R.string.app_name) + " - No URLs")
+                .addLine(getString(R.string.notifNoURLToCheck))
+                .addLine(getString(R.string.notifAddURL))
+                .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock)))
                 .setSmallIcon(R.drawable.ic_stat_waiting)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
-                .setTicker("Censor Census - No URLs")
+                .setTicker(getString(R.string.app_name) + " - No URLs")
                 .setAutoCancel(false);
         mBuilder.setProgress(0,0,false);
 
@@ -235,14 +235,14 @@ public class CensorCensusService extends Service
         }
 
         mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                .setBigContentTitle("Censor Census - URL Received")
-                .addLine("Received a new url!")
-                .addLine("Performing sanity checks...")
-                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked"))
+                .setBigContentTitle(getString(R.string.app_name) + " - " + getString(R.string.notifURLRecv))
+                .addLine(getString(R.string.notifNewURL))
+                .addLine(getString(R.string.notifSanityCheck))
+                .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock)))
                 .setSmallIcon(R.drawable.ic_stat_in_progress)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
-                .setTicker("Censor Census - URL Received")
+                .setTicker(getString(R.string.app_name) + " - " + getString(R.string.notifURLRecv))
                 .setAutoCancel(false);
 
         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -263,11 +263,11 @@ public class CensorCensusService extends Service
                         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
                         mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                                .setBigContentTitle("Censor Census - Checking URL")
-                                .addLine("Started at " + currentDateTimeString)
-                                .addLine("Checking URL.....")
+                                .setBigContentTitle(getString(R.string.app_name) + " - " + getString(R.string.notifCheckURL))
+                                .addLine(getString(R.string.notifStartAt)+ " " + currentDateTimeString)
+                                .addLine(getString(R.string.notifCheckURL) + ".....")
                                 .addLine("MD5: " + hash)
-                                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
+                                .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock))
                         );
                         mBuilder.setProgress(2,1,true);
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -298,13 +298,13 @@ public class CensorCensusService extends Service
                             {
                                 ORGCensorIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.BLOCKED);
 
-                                mBuilder.setTicker("Found a possibly blocked URL!");
+                                mBuilder.setTicker(getString(R.string.notifFoundBlock));
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                                        .setBigContentTitle("Censor Census - Waiting")
-                                        .addLine("Last check: " + currentDateTimeString)
-                                        .addLine("Last URL was possibly blocked!")
+                                        .setBigContentTitle(getString(R.string.app_name) + " - " + getString(R.string.notifWaiting))
+                                        .addLine(getString(R.string.notifLastChk) + ": " + currentDateTimeString)
+                                        .addLine(getString(R.string.notifLastURLBlocked))
                                         .addLine("MD5: " + intent.getStringExtra("hash"))
-                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
+                                        .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock))
 
                                 );
                                 mBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large_censored));
@@ -314,12 +314,12 @@ public class CensorCensusService extends Service
 
                                 ORGCensorIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.OK);
 
-                                mBuilder.setTicker("Last URL wasn't blocked");
+                                mBuilder.setTicker(getString(R.string.notifLastChkNotBlock));
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                                        .setBigContentTitle("Censor Census - Waiting")
-                                        .addLine("Last check: " + currentDateTimeString)
-                                        .addLine("Last URL wasn't blocked!")
-                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
+                                        .setBigContentTitle(getString(R.string.app_name) + " - " + getString(R.string.notifWaiting))
+                                        .addLine(getString(R.string.notifLastChk) + ": " + currentDateTimeString)
+                                        .addLine(getString(R.string.notifLastChkNotBlock))
+                                        .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock))
                                 );
                             }
 
@@ -333,10 +333,10 @@ public class CensorCensusService extends Service
                             currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
                             mBuilder.setStyle(new NotificationCompat.InboxStyle()
-                                    .setBigContentTitle("Censor Census - Error")
-                                    .addLine("Last check: " + currentDateTimeString)
-                                    .addLine("An exception was encountered during the last check")
-                                    .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
+                                    .setBigContentTitle(getString(R.string.app_name) + " - " + getString(R.string.notifError))
+                                    .addLine(getString(R.string.notifLastChk) + ": " + currentDateTimeString)
+                                    .addLine(getString(R.string.notifException))
+                                    .setSummaryText(Integer.toString(checkedCount) + getString(R.string.notifChecked) + Integer.toString(censoredCount) + getString(R.string.notifPossBlock))
                             );
 
                             censorPayload = null;
@@ -421,7 +421,7 @@ public class CensorCensusService extends Service
             JSONObject requestHeaders = new JSONObject();
             for(Header hdr : headRequest.getAllHeaders())
             {
-                requestHeaders.put(hdr.getName().toString(),hdr.getValue().toString());
+                requestHeaders.put(hdr.getName(),hdr.getValue());
             }
             ooniRequest.put("headers",requestHeaders);
             ooniRequest.put("method","HEAD");
@@ -433,7 +433,7 @@ public class CensorCensusService extends Service
             JSONObject responseHeaders = new JSONObject();
             for(Header hdr : response.getAllHeaders())
             {
-                responseHeaders.put(hdr.getName().toString(),hdr.getValue().toString());
+                responseHeaders.put(hdr.getName(),hdr.getValue());
             }
 
             ooniRequest.put("response",ooniResponse);
@@ -523,7 +523,7 @@ public class CensorCensusService extends Service
                     {
                         for (Header hdr : httpResponse.getAllHeaders())
                         {
-                            if (hdr.getName().toString().equals("Location"))
+                            if (hdr.getName().equals("Location"))
                             {
                                 /*if (hdr.getValue().equals("http://ee-outage.s3.amazonaws.com/content-blocked/content-blocked-v1.html") ||
                                     hdr.getValue().contains("http://ee-outage.s3.amazonaws.com"))
@@ -669,7 +669,7 @@ public class CensorCensusService extends Service
 
         for(Header hdr : response.getAllHeaders())
         {
-            Log.e("checkURL header",hdr.getName().toString() + " / " + hdr.getValue().toString());
+            Log.e("checkURL header",hdr.getName() + " / " + hdr.getValue());
         }
 
         censorPayload.setCensored(false);
