@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 - Gareth Llewellyn
+* Copyright (C) 2014 - Gareth Llewellyn
 *
 * This file is part of Bowdlerize - https://bowdlerize.co.uk
 *

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 - Gareth Llewellyn
+* Copyright (C) 2014 - Gareth Llewellyn
 *
 * This file is part of Bowdlerize - https://bowdlerize.co.uk
 *
@@ -39,16 +39,13 @@ import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -59,16 +56,11 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
-import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.ProgressFragment;
 import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.CensoredException;
@@ -186,7 +178,7 @@ public class CensorCensusService extends Service
                 .setBigContentTitle("Censor Census - Requesting URL")
                 .addLine("Requesting a URL for testing...")
                 .addLine("( Polling blocked.org.uk )")
-                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
+                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked"))
                 .setSmallIcon(R.drawable.ic_stat_in_progress)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
@@ -207,7 +199,7 @@ public class CensorCensusService extends Service
                 .setBigContentTitle("Censor Census - No URLs")
                 .addLine("There are currently no URLs queued to be checked.")
                 .addLine("Why not add one of your own?")
-                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
+                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked"))
                 .setSmallIcon(R.drawable.ic_stat_waiting)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
@@ -246,7 +238,7 @@ public class CensorCensusService extends Service
                 .setBigContentTitle("Censor Census - URL Received")
                 .addLine("Received a new url!")
                 .addLine("Performing sanity checks...")
-                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored"))
+                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked"))
                 .setSmallIcon(R.drawable.ic_stat_in_progress)
                 .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large))
                 .setPriority(Notification.PRIORITY_MAX)
@@ -275,7 +267,7 @@ public class CensorCensusService extends Service
                                 .addLine("Started at " + currentDateTimeString)
                                 .addLine("Checking URL.....")
                                 .addLine("MD5: " + hash)
-                                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
+                                .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
                         );
                         mBuilder.setProgress(2,1,true);
                         mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -304,13 +296,13 @@ public class CensorCensusService extends Service
                                 newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.BLOCKED);
                                 sendBroadcast(newIntent);
 
-                                mBuilder.setTicker("Found a possibly censored URL!");
+                                mBuilder.setTicker("Found a possibly blocked URL!");
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
                                         .setBigContentTitle("Censor Census - Waiting")
                                         .addLine("Last check: " + currentDateTimeString)
-                                        .addLine("Last URL was possibly censored!")
+                                        .addLine("Last URL was possibly blocked!")
                                         .addLine("MD5: " + intent.getStringExtra("hash"))
-                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
+                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
 
                                 );
                                 mBuilder.setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_ooni_large_censored));
@@ -322,11 +314,12 @@ public class CensorCensusService extends Service
                                 newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.OK);
                                 sendBroadcast(newIntent);
 
+                                mBuilder.setTicker("Last URL wasn't blocked");
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
                                         .setBigContentTitle("Censor Census - Waiting")
                                         .addLine("Last check: " + currentDateTimeString)
-                                        .addLine("Last URL wasn't censored!")
-                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
+                                        .addLine("Last URL wasn't blocked!")
+                                        .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
                                 );
                             }
                         }
@@ -341,7 +334,7 @@ public class CensorCensusService extends Service
                                     .setBigContentTitle("Censor Census - Error")
                                     .addLine("Last check: " + currentDateTimeString)
                                     .addLine("An exception was encountered during the last check")
-                                    .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly Censored")
+                                    .setSummaryText(Integer.toString(checkedCount) + " Checked / " + Integer.toString(censoredCount) + " Possibly blocked")
                             );
 
                             censorPayload = null;
@@ -378,7 +371,7 @@ public class CensorCensusService extends Service
         {
             am.cancel(pi); // cancel any existing alarms
             //TODO Setback to 60000
-            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 60000);//60000 or 5000
+            long repeat = (long) (getPreferences(CensorCensusService.this).getInt(API.SETTINGS_FREQUENCY, 1) * 5000);//60000 or 5000
             Log.e("onProbeFinish",Long.toString(repeat));
             Log.e("onProbeFinish","          -         ");
             Log.e("onProbeFinish","          -         ");

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 - Gareth Llewellyn
+* Copyright (C) 2014 - Gareth Llewellyn
 *
 * This file is part of Bowdlerize - https://bowdlerize.co.uk
 *
@@ -169,7 +169,7 @@ public class LocalCache
             //dbResults = database.query("probeResults", resultColumns,  null, null, null, null, null);
 
             //"id","isp","testTime","md5","url","result"
-            dbResults = database.rawQuery("select id,ispName,testTime,md5,url,result from probeResults inner join isp on isp = ispID",null,null);
+            dbResults = database.rawQuery("select id,ispName,testTime,md5,url,result from probeResults inner join isp on isp = ispID order by testTime DESC",null,null);
 
             if(dbResults.getCount() > 0)
             {

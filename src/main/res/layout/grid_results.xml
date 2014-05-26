@@ -13,12 +13,14 @@
     android:id="@+id/relativeLayout">
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/ooniImage"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_ooni_large" />
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_ooni_large"
+        android:layout_margin="12dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,7 +31,10 @@
         android:fontFamily="sans-serif-light"
         android:layout_below="@+id/ooniImage"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:enabled="false"
+        android:ellipsize="end"
+        android:lines="1" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -43,22 +48,25 @@
         android:gravity="fill_horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Small Text"
             android:id="@+id/ispTV"
             android:fontFamily="sans-serif-thin"
-            android:paddingRight="4dp" />
+            android:paddingRight="4dp"
+            android:layout_weight="1" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Small Text"
             android:id="@+id/dateTV"
             android:fontFamily="sans-serif-thin"
-            android:paddingLeft="4dp" />
+            android:paddingLeft="4dp"
+            android:layout_weight="1"
+            android:gravity="right" />
         </LinearLayout>
 
 

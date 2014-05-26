@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2013 - Gareth Llewellyn
+* Copyright (C) 2014 - Gareth Llewellyn
 *
 * This file is part of Bowdlerize - https://bowdlerize.co.uk
 *
@@ -20,12 +20,10 @@ package uk.bowdlerize;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -37,10 +35,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -56,16 +52,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutionException;
-
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
-
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.ISPMeta;

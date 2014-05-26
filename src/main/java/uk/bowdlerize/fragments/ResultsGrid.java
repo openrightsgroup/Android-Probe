@@ -1,25 +1,34 @@
+/*
+* Copyright (C) 2014 - Gareth Llewellyn
+*
+* This file is part of Bowdlerize - https://bowdlerize.co.uk
+*
+* This program is free software: you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along with
+* this program. If not, see <http://www.gnu.org/licenses/>
+*/
 package uk.bowdlerize.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-
-import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.support.ResultMeta;
@@ -70,6 +79,12 @@ public class ResultsGrid extends Fragment
                 }
             }
         };
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
 
         ((Thread) new Thread(){
             public void run()
