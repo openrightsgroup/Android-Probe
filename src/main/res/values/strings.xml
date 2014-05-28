@@ -150,11 +150,18 @@ Try again later</string>
     <!-- About Page -->
     <string name="aboutTitle">What\'s the problem?</string>
     <string name="aboutExplain">Filtering technologies are being promoted by government as a means to prevent children from accessing inappropriate sexual material. However in practice, many more people are finding themselves behind filters, which block a much wider range of material. Sometimes, like blogs or forums, this may be deliberate but not really necessary, while at other times, it can be by mistake.
-\n\nThis makes filters unnecessarily disruptive to the and very difficult for website owners to understand what is happening, and correct or limit damage.</string>
+\n\nThis makes filters unnecessarily disruptive to the and very difficult for website owners to understand what is happening, and correct or limit damage.
+    \n\nThis app helps your device be part of the Open Rights Group benevolent botnet by crawling links that have been flagged </string>
     <string name="aboutCreditsTitle">Credits</string>
     <string name="aboutCredits">TBC</string>
     <string name="aboutContact">Email us: blocked@OpenRightsGroup.org</string>
     <string name="aboutCallToAction">Join the OpenRightsGroup!</string>
+    <string name="aboutAboutTitle">About App:</string>
+    <string name="aboutVersion">Version: </string>
+    <string name="aboutCompiledBy">Last Compiled By: </string>
+    <string name="aboutLastCompile">Compiled On: </string>
+    <string name="aboutPowerUser">You are almost a power user!</string>
+    <string name="aboutPowerUserComplete">You are now a power user!</string>
 
     <!-- Widgets -->
     <string name="widgetHelp">Tap to test a new URL</string>
