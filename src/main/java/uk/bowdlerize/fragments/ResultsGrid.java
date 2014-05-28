@@ -53,6 +53,7 @@ public class ResultsGrid extends Fragment
     BroadcastReceiver receiver;
     IntentFilter filter;
     ResultsGridAdapter adapter;
+    static public String INTENT_FILTER = "result_grid";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -94,18 +95,24 @@ public class ResultsGrid extends Fragment
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                if (null != intent &&
-                    intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.BLOCKED ||
-                    intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0) == ProgressFragment.OK)
+                try {
+                    if (null != intent &&
+                            intent.getIntExtra(ResultsGrid.INTENT_FILTER, -1) == LocalCache.RESULT_BLOCKED ||
+                            intent.getIntExtra(ResultsGrid.INTENT_FILTER, -1) == LocalCache.RESULT_OK) {
+                        try
+                        {
+                            if (null != adapter)
+                                adapter.addResult(new ResultMeta(intent.getStringExtra("url"), intent.getStringExtra("hash"), intent.getStringExtra("date"), intent.getIntExtra(ResultsGrid.INTENT_FILTER, LocalCache.RESULT_OK)));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                catch (Exception e)
                 {
-                    try {
-                        if (null != adapter)
-                            adapter.addResult(new ResultMeta(intent.getStringExtra("url"), intent.getStringExtra("hash"), intent.getStringExtra("date"), intent.getIntExtra(ProgressFragment.ORG_BROADCAST, 0)));
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
                 }
             }
         };

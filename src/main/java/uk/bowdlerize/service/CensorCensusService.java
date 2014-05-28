@@ -61,7 +61,9 @@ import java.util.Date;
 import uk.bowdlerize.API;
 import uk.bowdlerize.MainActivity;
 import uk.bowdlerize.R;
+import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.ProgressFragment;
+import uk.bowdlerize.fragments.ResultsGrid;
 import uk.bowdlerize.support.CensorPayload;
 import uk.bowdlerize.support.CensoredException;
 
@@ -297,6 +299,7 @@ public class CensorCensusService extends Service
                             if(censorPayload.wasCensored())
                             {
                                 ORGCensorIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.BLOCKED);
+                                ORGCensorIntent.putExtra(ResultsGrid.INTENT_FILTER, LocalCache.RESULT_BLOCKED);
 
                                 mBuilder.setTicker(getString(R.string.notifFoundBlock));
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
@@ -313,6 +316,7 @@ public class CensorCensusService extends Service
                             {
 
                                 ORGCensorIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.OK);
+                                ORGCensorIntent.putExtra(ResultsGrid.INTENT_FILTER,LocalCache.RESULT_OK);
 
                                 mBuilder.setTicker(getString(R.string.notifTitle) + " - " + getString(R.string.notifLastChkNotBlock));
                                 mBuilder.setStyle(new NotificationCompat.InboxStyle()
