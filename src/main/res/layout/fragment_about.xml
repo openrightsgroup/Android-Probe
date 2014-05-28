@@ -1,0 +1,80 @@
+<ScrollView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/aboutTitle"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="bold"
+            android:id="@+id/textView"
+            android:paddingTop="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/aboutExplain"
+            android:id="@+id/textView2"
+            android:paddingTop="12dp"
+            android:paddingLeft="12dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/aboutContact"
+            android:id="@+id/textView5"
+            android:autoLink="email"
+            android:gravity="center_horizontal"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/aboutCreditsTitle"
+            android:id="@+id/textView3"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="bold"
+            android:paddingTop="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/aboutCredits"
+            android:id="@+id/textView4"
+            android:paddingTop="12dp"
+            android:paddingLeft="12dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/aboutCallToAction"
+            android:id="@+id/callToActionButton"
+            android:background="@drawable/red_button"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"
+            android:textColor="#FFFFFF"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            android:padding="18dp"
+            android:layout_marginTop="20dp" />
+    </LinearLayout>
+    </ScrollView>

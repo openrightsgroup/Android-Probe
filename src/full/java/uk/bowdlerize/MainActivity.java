@@ -52,7 +52,6 @@ import uk.bowdlerize.fragments.ProgressFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import uk.bowdlerize.cache.LocalCache;
 import uk.bowdlerize.fragments.CheckConfigFragment;
 import uk.bowdlerize.fragments.ResultsGrid;
@@ -60,6 +59,7 @@ import uk.bowdlerize.fragments.StatsFragment;
 import uk.bowdlerize.fragments.WirelessConfigFragment;
 import uk.bowdlerize.service.CensorCensusService;
 import static uk.bowdlerize.support.Hashes.MD5;
+import uk.bowdlerize.fragments.AboutFragment;
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
 
@@ -563,6 +563,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     getFragment = new ResultsGrid();
                 }
                 break;
+
+                case 3:
+                {
+                    getFragment = new AboutFragment();
+                }
+                break;
             }
 
             return getFragment;
@@ -571,7 +577,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            return 5;
         }
 
         @Override
@@ -586,6 +592,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     return getString(R.string.title_section4).toUpperCase(l);
                 case 3:
                     return getString(R.string.title_section5).toUpperCase(l);
+                case 4:
+                    return getString(R.string.title_section6).toUpperCase(l);
             }
             return null;
         }

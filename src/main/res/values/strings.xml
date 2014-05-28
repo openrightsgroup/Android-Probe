@@ -37,6 +37,7 @@
     <string name="title_section3">Observatory of Net Interference Signup</string>
     <string name="title_section4">Visualisation</string>
     <string name="title_section5">Results</string>
+    <string name="title_section6">About</string>
 
     <string name="action_settings">Settings</string>
     <string name="action_add">Test Link</string>
@@ -145,6 +146,15 @@ Try again later</string>
     <string name="yourISPLabel">Your ISP</string>
     <string name="targetWebsite">Target Website</string>
 
+
+    <!-- About Page -->
+    <string name="aboutTitle">What\'s the problem?</string>
+    <string name="aboutExplain">Filtering technologies are being promoted by government as a means to prevent children from accessing inappropriate sexual material. However in practice, many more people are finding themselves behind filters, which block a much wider range of material. Sometimes, like blogs or forums, this may be deliberate but not really necessary, while at other times, it can be by mistake.
+\n\nThis makes filters unnecessarily disruptive to the and very difficult for website owners to understand what is happening, and correct or limit damage.</string>
+    <string name="aboutCreditsTitle">Credits</string>
+    <string name="aboutCredits">TBC</string>
+    <string name="aboutContact">Email us: blocked@OpenRightsGroup.org</string>
+    <string name="aboutCallToAction">Join the OpenRightsGroup!</string>
 
     <!-- Widgets -->
     <string name="widgetHelp">Tap to test a new URL</string>
