@@ -335,15 +335,20 @@ public class WirelessConfigFragment extends Fragment
             @Override
             protected Integer doInBackground(Void... params)
             {
-                API api = new API(getActivity());
-                return api.ascertainFilteringLevel();
+                try {
+                    API api = new API(getActivity());
+                    return api.ascertainFilteringLevel();
+                }
+                catch (Exception e)
+                {
+                    return -1;
+                }
             }
 
             @Override
             protected void onPostExecute(Integer filteringLevel)
             {
-
-                if(filteringLevel < 0)
+                if(null == filteringLevel || filteringLevel < 0)
                 {
                     censorLevel.setText(getString(R.string.filterIndeterLabel));
                 }

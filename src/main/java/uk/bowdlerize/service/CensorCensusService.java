@@ -87,6 +87,8 @@ public class CensorCensusService extends Service
     HttpResponse response = null;
     API api = null;
     int bytes = 0;
+    Intent launchAppIntent = null;
+    PendingIntent pendingIntent = null;
 
     @Override
     public IBinder onBind(Intent intent)
@@ -111,6 +113,11 @@ public class CensorCensusService extends Service
         checkedCount = getPreferences(this).getInt("checkedCount", 0);
         censoredCount = getPreferences(this).getInt("censoredCount", 0);
         sendtoORG  = getPreferences(this).getBoolean("sendToOrg", false);
+
+        //Make it so tapping an intent will launch the app (Fix #12)
+        launchAppIntent = new Intent(mContext, MainActivity.class);
+        pendingIntent = PendingIntent.getActivity(mContext, 0, launchAppIntent, 0);
+        mBuilder.setContentIntent(pendingIntent);
 
         //Lets findout why we've been started
         if(intent.getBooleanExtra(API.EXTRA_POLL,false) || intent.getBooleanExtra(API.EXTRA_GCM_TICKLE,false))
