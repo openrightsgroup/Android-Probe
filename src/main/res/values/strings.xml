@@ -28,8 +28,10 @@
     =======================================================================================-->
 
     <string name="app_name">Blocked!</string>
-    <string name="actionBarTitle">Blocked!</string>
+    <string name="actionBarTitle">Blocked.org.uk</string>
     <string name="actionBarSubtitle">Censorship Monitoring Project</string>
+    <string name="notifTitle">Censor Census</string>
+
     <string name="title_section1">ISP Info</string>
     <string name="title_section2">Request Config</string>
     <string name="title_section3">Observatory of Net Interference Signup</string>
@@ -55,7 +57,7 @@
     <string name="passwordHint">Password</string>
 
     <!-- Notifications -->
-    <string name="notifChecked">Checked / </string>
+    <string name="notifChecked">Checked</string>
     <string name="notifPossBlock"> Possibly blocked</string>
     <string name="notifURLRecv">URL Received</string>
     <string name="notifNewURL">Received a new URL!</string>

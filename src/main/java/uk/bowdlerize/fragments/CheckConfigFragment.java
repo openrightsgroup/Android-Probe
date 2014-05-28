@@ -57,7 +57,7 @@ public class CheckConfigFragment extends Fragment
 
         seekValue = (TextView) rootView.findViewById(R.id.delayValueLabel);
 
-        seekValue.setText(getString(R.string.waitPrepend) + strTimes[settings.getInt(API.SETTINGS_FREQUENCY_SEEK,0)]  + getString(R.string.betweenAppend));
+        seekValue.setText(getString(R.string.waitPrepend) + " " + strTimes[settings.getInt(API.SETTINGS_FREQUENCY_SEEK,0)]  + " " +getString(R.string.betweenAppend));
 
         ((SeekBar) rootView.findViewById(R.id.seekBar)).setProgress(settings.getInt(API.SETTINGS_FREQUENCY_SEEK, 0));
 
@@ -65,7 +65,7 @@ public class CheckConfigFragment extends Fragment
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
-                seekValue.setText(getString(R.string.waitPrepend) + strTimes[progress] + getString(R.string.betweenAppend));
+                seekValue.setText(getString(R.string.waitPrepend) + " " + strTimes[progress] + " " + getString(R.string.betweenAppend));
             }
 
             @Override
