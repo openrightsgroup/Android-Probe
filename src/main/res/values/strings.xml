@@ -27,9 +27,9 @@
     Thank you!
     =======================================================================================-->
 
-    <string name="app_name">Censor Census</string>
-    <string name="actionBarTitle">Censorship Monitoring Project</string>
-    <string name="actionBarSubtitle">Making censorship accountable</string>
+    <string name="app_name">Blocked!</string>
+    <string name="actionBarTitle">Blocked!</string>
+    <string name="actionBarSubtitle">Censorship Monitoring Project</string>
     <string name="title_section1">ISP Info</string>
     <string name="title_section2">Request Config</string>
     <string name="title_section3">Observatory of Net Interference Signup</string>
