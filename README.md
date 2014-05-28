@@ -1,33 +1,32 @@
-# The Censor Census Android Client #
-Originally started life as the [Bowdlerize.co.uk](https://bowdlerize.co.uk) Censor Census Project but is now part of the [Open Rights Group Censorship Monitoring Project](https://wiki.openrightsgroup.org/wiki/ORG_Censorship_Monitoring_Project) feeding into the [Open Observatory of Network Interference](https://ooni.torproject.org/)
+# The Open Rights Group Blocked! Android Client #
 
 ## How To Help Bring Transparency To UK Internet Filtering ##
 
-* Install the app from [Google Play](https://play.google.com/store/apps/details?id=uk.org.blocked.app)
-* URLs are sent to your phone/tablet from the Censorship Monitoring Project servers *(URLs are found from social media or user submissions)*
+* Install the app from [Google Play](https://play.google.com/store/apps/details?id=uk.org.blocked.app) or fork this repo and install yourself via [Android Studio](https://developer.android.com/sdk/installing/studio.html)
+* URLs are sent to your phone/tablet from the Blocked! servers *(URLs are found from social media or user submissions on https://blocked.org.uk)*
 * Your device issues a [HTTP GET request](https://developer.android.com/reference/org/apache/http/client/methods/HttpGet.html) and then reports back if it could reach the URL or not
-* The Censorship Monitoring Project servers retain this information to help map the spread of online censorship
+* The Blocked! servers retain this information to help map the spread of online censorship
 * Censorship data may also passed onto the [Open Observatory of Network Interference](https://ooni.torproject.org/)
 
-## Why is this needed? ##
+## What's the problem? ##
 
-Phone companies censor the mobile Internet because they don't know whether their phones are being given to children and young adults. But a lack of transparency, mistakes and the difficulty of opting out of the censorship mean that people often find content blocked when it shouldn't be. Here are some of the problems:
+Filtering technologies are being promoted by government as a means to prevent children from accessing inappropriate sexual material. However in practice, many more people are finding themselves behind filters, which block a much wider range of material. Sometimes, like blogs or forums, this may be deliberate but not really necessary, while at other times, it can be by mistake.
 
-* Phone companies do not properly inform adults that they may encounter censorship, or fully explain what is blocked.
-* It is difficult to opt out, and people who do are often actually asked to “opt in” to pornography.
-* The blocking is simplistic and doesn't really protect younger children.
-* Mobile companies don't allow website owners to check if their sites are blocked, and don't make it easy to report when things go wrong.
-* Their staff seem poorly trained to help users making complaints.
-* This is damaging businesses (when a business can't reach its market, for example) and restricts our access to legal and often non-adult material. Mobile Internet access is growing fast. According to Ofcom 28% of UK adults said they accessed the internet on their mobile in the first three months of 2011. Mobile data use increased forty-fold between 2007 and 2010. It is critical that this access to the mobile Internet is not subjected to crude censorship that is susceptible to mistakes or deliberate misuse.
+This makes filters unnecessarily disruptive to the and very difficult for website owners to understand what is happening, and correct or limit damage.
 
-The Open Rights Group have published a report, jointly with LSE Media Policy Project, that reveals the incorrect blocking notified through this website between January and March 2012. You can read more about the report [here](https://www.openrightsgroup.org/ourwork/reports/mobile-internet-censorship:-whats-happening-and-what-we-can-do-about-it)
+###Other censorship###
 
-We want to see more transparency from phone companies, more choice for mobile users and easier ways to report mistakes.
+Other censorship is mandatory but not well documented, starting with copyright blocks. Here, court orders allow the claimant to order ISPs to block any domain or sometimes IP address that is serving copies of the original. Orders are usually drafted to be indefinite and blocking pages do not explain the legal basis not how to complain or correct mistakes.
 
-### Phone companies should ensure that:###
+This will have some impact on the reports we receive of blocks on networks.
 
-* Every adult is given a straightforward choice at sign up, whether to live with censorship or not. This is often called an 'active choice'.
-* Every adult is given clear advice about the kind of content that may be blocked.
-* They provide information on how their blocking works.
-* Every mobile operator provides clear and easy ways to check if a site is blocked.
-* Every mobile operator provides an easy ways to complain about wrongful blocks, including at the time that you find an incorrectly blocked website.
+##Opportunities##
+
+* Making the real behaviour of these filters transparent;
+* Helping website owners check whether a given filter has blocked their site erroneously;
+* Improving processes for correcting censorship mistakes;
+* Improving the supervision of children online by informing society about filter effectiveness;
+* Reducing the potential for infringement of the rights of children (and others) to access information and express themselves online;
+* Stimulating and informing public debate about the pros and cons of default-on web filtering;
+* Researching and documenting censorship methods and technologies;
+* Producing code and data that can be reused by others.
