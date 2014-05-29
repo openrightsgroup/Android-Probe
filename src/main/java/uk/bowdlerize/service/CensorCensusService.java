@@ -351,6 +351,11 @@ public class CensorCensusService extends Service
                             );
 
                             censorPayload = null;
+
+                            Intent newIntent = new Intent();
+                            newIntent.setAction(ProgressFragment.ORG_BROADCAST);
+                            newIntent.putExtra(ProgressFragment.ORG_BROADCAST,ProgressFragment.NO_URLS);
+                            sendBroadcast(newIntent);
                         }
 
 

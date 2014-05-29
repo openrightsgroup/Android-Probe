@@ -564,7 +564,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 }
                 break;
 
-                case 3:
+                case 4:
                 {
                     getFragment = new AboutFragment();
                 }
