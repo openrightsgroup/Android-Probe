@@ -685,6 +685,12 @@ public class API
             } else if (header.getValue().contains("http://assets.o2.co.uk/18plusaccess/")) {
                 Log.e("Blocked", "Blocked by O2");
                 throw new CensoredException("Blocked by O2", "O2", 100);
+            } else if (header.getName().contains("http://assets.virginmedia.com/parental.html")) {
+                Log.e("Blocked", "Blocked by Virgin Media");
+                throw new CensoredException("Blocked by Virgin Media", "VirginMedia", 100);
+            } else if (header.getName().contains("http://block.nb.sky.com")) {
+                Log.e("Blocked", "Blocked by Sky");
+                throw new CensoredException("Blocked by Sky", "Sky", 100);
             }
             else
             {
