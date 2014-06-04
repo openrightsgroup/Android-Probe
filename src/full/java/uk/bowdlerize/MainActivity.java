@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -103,6 +104,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         getActionBar().setTitle(getString(R.string.actionBarTitle));
         getActionBar().setSubtitle(getString(R.string.actionBarSubtitle));
         getActionBar().setIcon(R.drawable.ic_ab_alt);
+        getActionBar().setHomeButtonEnabled(true);
 
         settings = getGCMPreferences(this);
         Log.e("VERSION","HAS GOOGLE PLAY");
@@ -340,6 +342,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId())
         {
+            case android.R.id.home:
+            {
+                startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://www.blocked.org.uk")));
+                return true;
+            }
+
             case R.id.action_add:
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
