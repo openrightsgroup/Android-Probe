@@ -162,11 +162,16 @@ public class CensorCensusService extends Service
                     warnOnPrep();
                     url = api.getURLBasic();
                     hash = MD5(url);
-
-                    intent.putExtra("url",url);
-                    intent.putExtra("hash",hash);
-
-                    performProbe(intent);
+                    if(null == url)
+                    {
+                        throw new NullPointerException("No URL");
+                    }
+                    else
+                    {
+                        intent.putExtra("url", url);
+                        intent.putExtra("hash", hash);
+                        performProbe(intent);
+                    }
                 }
                 catch (Exception e)
                 {
